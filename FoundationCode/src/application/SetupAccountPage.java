@@ -49,10 +49,22 @@ public class SetupAccountPage {
         setupButton.setOnAction(a -> {
         	// Retrieve user input
             String userName = userNameField.getText();
+            String userNameErrorMessage = UserNameRecognizer.checkForValidUserName(userName);
             String password = passwordField.getText();
+            String passwordErrorMessage = PasswordEvaluator.evaluatePassword(password);
             String code = inviteCodeField.getText();
             
             try {
+            	if (!userNameErrorMessage.equals("")) {
+            		errorLabel.setText(userNameErrorMessage);
+            		return;
+            	}
+            	if (!passwordErrorMessage.equals("")) {
+            		errorLabel.setText(passwordErrorMessage);
+            		return;
+            	}
+            	
+            	
             	// Check if the user already exists
             	if(!databaseHelper.doesUserExist(userName)) {
             		

@@ -25,3 +25,8 @@ public class User {
     public String getPassword() { return password; }
     public String getRole() { return role; }
 }
+
+// admin
+//	abram 12345
+// invite
+//	b163
