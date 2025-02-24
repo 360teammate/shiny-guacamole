@@ -4,13 +4,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.sql.SQLException;
+
 import databasePart1.*;
 
 /**
- * The AdminSetupPage class handles the setup process for creating an administrator account.
+ * The SetupAdmin class handles the setup process for creating an administrator account.
+ * This is intended to be used by the first user to initialize the system with admin credentials.
  */
 public class AdminSetupPage {
+	
     private final DatabaseHelper databaseHelper;
 
     public AdminSetupPage(DatabaseHelper databaseHelper) {
@@ -18,42 +22,47 @@ public class AdminSetupPage {
     }
 
     public void show(Stage primaryStage) {
+    	// Input fields for userName and password
         TextField userNameField = new TextField();
-        userNameField.setPromptText("Enter Admin Username");
+        userNameField.setPromptText("Enter Admin userName");
         userNameField.setMaxWidth(250);
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter Password");
         passwordField.setMaxWidth(250);
 
+        Button setupButton = new Button("Setup");
+        
+        // Label to display error messages for invalid input or registration issues
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
-
-        Button setupButton = new Button("Setup");
-
+        
         setupButton.setOnAction(a -> {
+        	// Retrieve user input
             String userName = userNameField.getText();
+            String userNameErrorMessage = UserNameRecognizer.checkForValidUserName(userName);
             String password = passwordField.getText();
-            
-            String userNameError = UserNameRecognizer.checkForValidUserName(userName);
-            if (!userNameError.isEmpty()) {
-                errorLabel.setText(userNameError);
-                return;
-            }
-
-            String passwordError = PasswordEvaluator.evaluatePassword(password);
-            if (!passwordError.isEmpty()) {
-                errorLabel.setText(passwordError);
-                return;
-            }
-
+            String passwordErrorMessage = PasswordEvaluator.evaluatePassword(password);
             try {
-                User user = new User(userName, password, "admin");
+            	if (!userNameErrorMessage.equals("")) {
+            		errorLabel.setText(userNameErrorMessage);
+            		return;
+            	}
+            	if (!passwordErrorMessage.equals("")) {
+            		errorLabel.setText(passwordErrorMessage);
+            		return;
+            	}
+            	
+            	// Create a new User object with admin role and register in the database
+            	User user=new User(userName, password, "admin");
                 databaseHelper.register(user);
-                System.out.println("Administrator setup completed. Please log in again.");
-                new SetupLoginSelectionPage(databaseHelper).show(primaryStage);
+                System.out.println("Administrator setup completed.");
+                
+                // Navigate to the Welcome Login Page
+                new WelcomeLoginPage(databaseHelper).show(primaryStage,user);
             } catch (SQLException e) {
-                errorLabel.setText("Database error: " + e.getMessage());
+                System.err.println("Database error: " + e.getMessage());
+                e.printStackTrace();
             }
         });
 
