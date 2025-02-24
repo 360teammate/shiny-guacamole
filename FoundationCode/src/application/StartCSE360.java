@@ -12,7 +12,9 @@ import java.sql.SQLException;
 
 import databasePart1.DatabaseHelper;
 
-
+/**
+ * The main entry point for the FoundationCode / HW1 application.
+ */
 public class StartCSE360 extends Application {
 
 	public static final DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -66,8 +68,6 @@ public class StartCSE360 extends Application {
 //        	System.out.println(e.getMessage());
 //        }
     }
-	
-
 }
 
 // abramadmin
