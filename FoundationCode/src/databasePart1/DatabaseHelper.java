@@ -4,9 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import application.User;
+import questions.Answer;
+import questions.Question;
 
 
 /**
@@ -34,7 +39,7 @@ public class DatabaseHelper {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement(); 
 			// You can use this command to clear the database and restart from fresh.
-			//statement.execute("DROP ALL OBJECTS");
+			// statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -55,6 +60,32 @@ public class DatabaseHelper {
 	            + "code VARCHAR(10) PRIMARY KEY, "
 	            + "isUsed BOOLEAN DEFAULT FALSE)";
 	    statement.execute(invitationCodesTable);
+	    
+	    String createQuestionsTable = "CREATE TABLE IF NOT EXISTS questions ("
+	            + "uuid VARCHAR(36) PRIMARY KEY, " 
+	            + "title VARCHAR(255) NOT NULL, "
+	            + "body_text TEXT NOT NULL, "
+	            + "author VARCHAR(255) NOT NULL, "
+	            + "posted_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+	            + "edited_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
+	            + "likes INT DEFAULT 0, "
+	            + "resolved BOOLEAN DEFAULT FALSE, "
+	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
+	    statement.execute(createQuestionsTable);
+
+
+	    String createAnswersTable = "CREATE TABLE IF NOT EXISTS answers ("
+	            + "uuid VARCHAR(36) PRIMARY KEY, " 
+	            + "body_text TEXT NOT NULL, "
+	            + "author VARCHAR(255) NOT NULL, "
+	            + "posted_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+	            + "edited_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
+	            + "likes INT DEFAULT 0, "
+	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
+	    statement.execute(createAnswersTable);
+
+
+	    
 	}
 
 
@@ -168,6 +199,145 @@ public class DatabaseHelper {
 	        e.printStackTrace();
 	    }
 	}
+	
+    // Insert a question into the database
+    public void insertQuestion(Question question) throws SQLException {
+        String insertQuery = "INSERT INTO questions (uuid, title, body_text, author, posted_date, edited_date, likes, resolved) "
+                           + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(insertQuery)) {
+            pstmt.setString(1, question.getUUID().toString());
+            pstmt.setString(2, question.getTitle());
+            pstmt.setString(3, question.getBodyText());
+            pstmt.setString(4, question.getAuthor());
+            pstmt.setTimestamp(5, new Timestamp(question.getPostedDate().getTime()));
+            pstmt.setTimestamp(6, new Timestamp(question.getEditedDate().getTime()));
+            pstmt.setInt(7, question.getLikes());
+            pstmt.setBoolean(8, question.getResolved());
+            pstmt.executeUpdate();
+        }
+    }
+  
+
+
+    // Insert an answer into the database
+    public void insertAnswer(Answer answer) throws SQLException {
+        String insertQuery = "INSERT INTO answers (uuid, body_text, author, posted_date, edited_date, likes, child_uuids) "
+                           + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(insertQuery)) {
+            pstmt.setString(1, answer.getUUID().toString());
+            pstmt.setString(2, answer.getBodyText());
+            pstmt.setString(3, answer.getAuthor());
+            pstmt.setTimestamp(4, new Timestamp(answer.getPostedDate().getTime()));
+            pstmt.setTimestamp(5, new Timestamp(answer.getEditedDate().getTime()));
+            pstmt.setInt(6, answer.getLikes());
+            pstmt.setString(7, ""); // New answer starts with no children
+            pstmt.executeUpdate();
+        }
+
+    }
+    
+    public ArrayList<String> convertUUIDToString(ArrayList<UUID> UUIDs) {
+    	ArrayList<String> stringUUIDs = new ArrayList<String>();
+    	for (UUID uuid : UUIDs) {
+    		stringUUIDs.add(uuid.toString());
+    	}
+    	return stringUUIDs;
+    }
+    
+    // Update an existing Question in the database
+    public void updateQuestion(Question question) throws SQLException {
+        String updateQuery = "UPDATE questions SET title = ?, body_text = ?, author = ?, "
+                           + "posted_date = ?, edited_date = ?, likes = ?, resolved = ?, child_uuids = ? "
+                           + "WHERE uuid = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+            pstmt.setString(1, question.getTitle());
+            pstmt.setString(2, question.getBodyText());
+            pstmt.setString(3, question.getAuthor());
+            pstmt.setTimestamp(4, new Timestamp(question.getPostedDate().getTime()));
+            pstmt.setTimestamp(5, new Timestamp(question.getEditedDate().getTime()));
+            pstmt.setInt(6, question.getLikes());
+            pstmt.setBoolean(7, question.getResolved());
+            pstmt.setString(8, String.join(",", convertUUIDToString(question.getChildren()))); // Convert list to CSV format
+            pstmt.setString(9, question.getUUID().toString());
+
+            pstmt.executeUpdate();
+        }
+    }
+
+    // Update an existing Answer in the database
+    public void updateAnswer(Answer answer) throws SQLException {
+        String updateQuery = "UPDATE answers SET body_text = ?, author = ?, posted_date = ?, "
+                           + "edited_date = ?, likes = ?, child_uuids = ? "
+                           + "WHERE uuid = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+            pstmt.setString(1, answer.getBodyText());
+            pstmt.setString(2, answer.getAuthor());
+            pstmt.setTimestamp(3, new Timestamp(answer.getPostedDate().getTime()));
+            pstmt.setTimestamp(4, new Timestamp(answer.getEditedDate().getTime()));
+            pstmt.setInt(5, answer.getLikes());
+            pstmt.setString(6, String.join(",", convertUUIDToString(answer.getChildren()))); // Convert list to CSV format
+            pstmt.setString(7, answer.getUUID().toString());
+
+            pstmt.executeUpdate();
+        }
+    }
+
+    
+    // Retrieve all questions from the database
+    public HashMap<UUID, Question> getQuestions() throws SQLException {
+        HashMap<UUID, Question> questions = new HashMap<>();
+        String query = "SELECT * FROM questions";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Question question = new Question(
+                    UUID.fromString(rs.getString("uuid")),
+                    rs.getString("child_uuids"), // Comma-separated child UUIDs
+                    rs.getString("title"),
+                    rs.getString("body_text"),
+                    rs.getString("author"),
+                    rs.getTimestamp("posted_date"),
+                    rs.getTimestamp("edited_date"),
+                    rs.getInt("likes"),
+                    rs.getBoolean("resolved")
+                );
+                questions.put(question.getUUID(), question);
+            }
+        }
+        return questions;
+    }
+
+    
+    // Retrieve all answers from the database
+    public HashMap<UUID, Answer> getAnswers() throws SQLException {
+        HashMap<UUID, Answer> answers = new HashMap<>();
+        String query = "SELECT * FROM answers";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Answer answer = new Answer(
+                    UUID.fromString(rs.getString("uuid")),
+                    rs.getString("child_uuids"), // Comma-separated child UUIDs
+                    rs.getString("body_text"),
+                    rs.getString("author"),
+                    rs.getTimestamp("posted_date"),
+                    rs.getTimestamp("edited_date"),
+                    rs.getInt("likes")
+                );
+                answers.put(answer.getUUID(), answer);
+            }
+        }
+        return answers;
+    }
+
 
 	// Closes the database connection and statement.
 	public void closeConnection() {
