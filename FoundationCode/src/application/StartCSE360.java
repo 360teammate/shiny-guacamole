@@ -24,6 +24,7 @@ public class StartCSE360 extends Application {
 	
 	@Override
     public void start(Stage primaryStage) {
+		// testing
 //		list.newQuestion(
 //				"Question about Individual Assignment 2",
 //				"From reading all the Ed Discussion posts I have deciphered that we need to decide which user stories apply to CRUD functionality. As far as I am concerned the only two items in the user story that applies strictly to CRUD are:\n"
