@@ -1,5 +1,7 @@
 package questions;
 
+import java.util.*;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,6 +24,9 @@ public class PostListUI {
         VBox newPostCard = createNewPostCard(primaryStage);
         contentBox.getChildren().add(newPostCard);
 
+        VBox filterCard = filterPostCard(primaryStage);
+        contentBox.getChildren().add(filterCard);
+        
         // ** Post List Wrapped in a Card **
         VBox postListCard = new VBox();
         postListCard.setSpacing(10);
@@ -34,16 +39,31 @@ public class PostListUI {
 
         postListCard.getChildren().add(postListTitle);
 
-        int count = 0;
-        for (Question question : this.questionList.getAllQuestions().values()) {
-            VBox postCard = createPostCard(question, primaryStage);
-            postListCard.getChildren().add(postCard);
+        if (this.questionList.getFoundQuestions() != null && this.questionList.getFoundQuestions().size() > 0) {
+        	int count = 0;
+            for (Question question : this.questionList.getFoundQuestions().values()) {
+                VBox postCard = createPostCard(question, primaryStage);
+                postListCard.getChildren().add(postCard);
 
-            // Add a horizontal separator after each post, except the last one
-            if (count < this.questionList.getAllQuestions().size() - 1) {
-                postListCard.getChildren().add(new Separator());
+                // Add a horizontal separator after each post, except the last one
+                if (count < this.questionList.getAllQuestions().size() - 1) {
+                    postListCard.getChildren().add(new Separator());
+                }
+                count++;
             }
-            count++;
+        }
+        else {
+        	int count = 0;
+            for (Question question : this.questionList.getAllQuestions().values()) {
+                VBox postCard = createPostCard(question, primaryStage);
+                postListCard.getChildren().add(postCard);
+
+                // Add a horizontal separator after each post, except the last one
+                if (count < this.questionList.getAllQuestions().size() - 1) {
+                    postListCard.getChildren().add(new Separator());
+                }
+                count++;
+            }
         }
 
         contentBox.getChildren().add(postListCard);
@@ -61,6 +81,72 @@ public class PostListUI {
         primaryStage.show();
     }
 
+    private VBox filterPostCard(Stage primaryStage) {
+    	Label titleLabel = new Label("Filter Posts");
+    	titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+    	TextField searchTermField = new TextField();
+    	searchTermField.setPromptText("Enter search term...");
+    	searchTermField.setMaxWidth(Double.MAX_VALUE);
+    	
+    	TextField searchUserField = new TextField();
+    	searchUserField.setPromptText("By user...");
+    	searchUserField.setMaxWidth(Double.MAX_VALUE);
+    	
+    	ComboBox<String> resolvedFilterComboBox = new ComboBox<>();
+    	resolvedFilterComboBox.getItems().addAll(
+    		"[Resolved Status]",
+    		"Resolved",
+    		"Unresolved"
+    	);
+    	
+    	resolvedFilterComboBox.getSelectionModel().select(0);
+    	resolvedFilterComboBox.setOnAction(event -> {
+    		// nothing probably
+    	});
+    	
+    	Button resetButton = new Button("Reset Filters");
+    	resetButton.setStyle("-fx-background-color: #CE0000; -fx-text-fill: white; -fx-border-radius: 5px;");
+    	resetButton.setOnMouseEntered(e -> resetButton.setStyle("-fx-background-color: #B90000; -fx-text-fill: white; -fx-border-radius: 5px;"));
+    	resetButton.setOnMouseExited(e -> resetButton.setStyle("-fx-background-color: #CE0000; -fx-text-fill: white; -fx-border-radius: 5px;"));
+    	
+    	resetButton.setOnAction(event -> {
+    		searchTermField.clear();
+    		searchUserField.clear();
+    		resolvedFilterComboBox.getSelectionModel().select(0);
+    		questionList.clearFoundQuestions();
+    		new PostListUI(questionList).show(primaryStage);
+    	});
+    	
+    	Button applyButton = new Button("Apply");
+    	applyButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px;");
+    	applyButton.setOnMouseEntered(e -> applyButton.setStyle("-fx-background-color: #45A049; -fx-text-fill: white; -fx-border-radius: 5px;"));
+    	applyButton.setOnMouseExited(e -> applyButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px;"));
+    	
+    	applyButton.setOnAction(event -> {
+    		String term = searchTermField.getText();
+    		String author = searchUserField.getText();
+    		Boolean state = null;
+    		if (resolvedFilterComboBox.getValue().equals("Resolved")) {
+    			state = true;
+    		}
+    		else if (resolvedFilterComboBox.getValue().equals("Unresolved")) {
+    			state = false;
+    		}
+    		// DEbUg
+    		HashMap<UUID, Question> result = questionList.searchAll(term, author, state);
+    		System.out.println(result.size());
+    		new PostListUI(questionList).show(primaryStage);
+    	});
+    	
+    	VBox newPostCard = new VBox(10, titleLabel, searchTermField, searchUserField, resolvedFilterComboBox, resetButton, applyButton);
+        newPostCard.setPadding(new Insets(10));
+        newPostCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
+        newPostCard.setMaxWidth(Double.MAX_VALUE);
+        
+        return newPostCard;
+    }
+    
     // ** Creates a new post creation card **
     private VBox createNewPostCard(Stage primaryStage) {
         Label titleLabel = new Label("Create a New Post");

@@ -12,7 +12,7 @@ import application.StartCSE360; // Importing main application class, likely cont
  */
 public class AnswerList {
     private HashMap<UUID, Answer> answers; // Stores all answers by their UUID
-    private HashMap<UUID, Answer> subSetOfAnswers; // Stores a filtered subset of answers
+    private HashMap<UUID, Answer> answersSubset; // Stores a filtered subset of answers
 
     /**
      * Constructor for initializing the answer list with a given set of answers.
@@ -21,7 +21,7 @@ public class AnswerList {
      */
     public AnswerList(HashMap<UUID, Answer> answers) {
         this.answers = answers;
-        this.subSetOfAnswers = new HashMap<>(); // Initialize an empty subset of answers
+        this.answersSubset = new HashMap<>(); // Initialize an empty subset of answers
     }
 
     /**
@@ -76,5 +76,5 @@ public class AnswerList {
     }
 
 	public HashMap<UUID, Answer> getAllAnswers() { return this.answers; }
-	public HashMap<UUID, Answer> getFoundAnswers() { return this.subSetOfAnswers; }
+	public HashMap<UUID, Answer> getFoundAnswers() { return this.answersSubset; }
 }
