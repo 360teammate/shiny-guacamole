@@ -1,3 +1,7 @@
 .DS_Store
-/.metadata/
-.classpath
+*.classpath
+*.class
+*.project
+
+bin/
+metadata/
