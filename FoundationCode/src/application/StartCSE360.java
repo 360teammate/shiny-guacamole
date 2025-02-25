@@ -38,7 +38,7 @@ public class StartCSE360 extends Application {
 //				+ "So I just have three total user stories (for task 1). Two from the document and one that I inferred. Would this be a safe and correct approach? ", 
 //				"Abram Pierce");
 //		list.newQuestion("Hello World", "Body text", "Author");
-		
+
 		try {
 			databaseHelper.connectToDatabase();
 			questions = new QuestionList(databaseHelper.getQuestions());
