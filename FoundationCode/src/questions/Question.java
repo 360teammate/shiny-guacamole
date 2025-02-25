@@ -12,6 +12,7 @@ import java.util.UUID;
 public class Question {
     private UUID uuid; // Unique identifier for the question
     private ArrayList<UUID> childrenIDs; // List of UUIDs for answers (children)
+    private UUID resolvingChildID; // UUID for answer resolving question
 
     private String title; // The title of the question
     private String bodyText; // The body content of the question
@@ -33,6 +34,7 @@ public class Question {
     public Question(UUID uuid, String title, String bodyText, String author) {
         this.uuid = uuid;
         this.childrenIDs = new ArrayList<>(); // Initialize an empty list of answers
+        resolvingChildID = null; // Default to no resolving question
 
         this.title = title;
         this.bodyText = bodyText;
@@ -47,16 +49,42 @@ public class Question {
     /**
      * Constructor for loading an existing question from stored data.
      *
-     * @param uuid        Unique identifier for the question.
-     * @param children    Comma-separated string of child answer UUIDs.
-     * @param title       The title of the question.
-     * @param bodyText    The content of the question.
-     * @param author      The author of the question.
-     * @param postedDate  The original posting date.
-     * @param editedDate  The last edited date.
-     * @param likes       The number of likes the question has received.
-     * @param resolved    Whether the question is resolved.
+     * @param uuid           Unique identifier for the question.
+     * @param children       Comma-separated string of child answer UUIDs.
+     * @param title          The title of the question.
+     * @param bodyText       The content of the question.
+     * @param author         The author of the question.
+     * @param postedDate     The original posting date.
+     * @param editedDate     The last edited date.
+     * @param likes          The number of likes the question has received.
+     * @param resolved       Whether the question is resolved.
+     * @param resolvingChild UUID for child that resolves question
      */
+    public Question(UUID uuid, String children, String title, String bodyText, String author, Date postedDate, Date editedDate, int likes, boolean resolved, UUID resolvingChildID) {
+        this.uuid = uuid;
+        this.childrenIDs = new ArrayList<>();
+
+        // Convert comma-separated child UUIDs into an ArrayList
+        System.out.println(children); // Debugging output to verify children string
+        for (String uuidStr : children.split(",")) {
+            if (!uuidStr.isBlank()) {
+                System.out.println(uuidStr); // Debugging output for each child UUID
+                childrenIDs.add(UUID.fromString(uuidStr));
+            }
+        }
+
+        this.title = title;
+        this.bodyText = bodyText;
+        this.author = author;
+        this.postedDate = postedDate;
+        this.editedDate = editedDate;
+        this.likes = likes;
+        this.resolved = resolved;
+        this.resolvingChildID = resolvingChildID;
+    }
+    
+    
+    // TODO: REMOVE EXISTS FOR TESTING PURPOSES DUE TO DATABASE UNFINISHED
     public Question(UUID uuid, String children, String title, String bodyText, String author, Date postedDate, Date editedDate, int likes, boolean resolved) {
         this.uuid = uuid;
         this.childrenIDs = new ArrayList<>();
@@ -88,7 +116,7 @@ public class Question {
         this.bodyText = newBodyText;
         this.editedDate = new Date(); // Update edited timestamp
     }
-
+    
     /**
      * Adds a child answer UUID to the list of child answers.
      *
@@ -107,6 +135,15 @@ public class Question {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(this.getPostedDate());
     }
+    
+    /**
+     * 
+     * @param UUID The UUID of the resolving child
+     */
+    public void resolveQuestion(UUID UUID) { 
+    	resolved = true; 
+    	resolvingChildID = UUID;
+    	}
 	
 	public UUID getUUID() { return this.uuid; }
 	public ArrayList<UUID> getChildren() { return this.childrenIDs; }
@@ -119,5 +156,6 @@ public class Question {
 	
 	public int getLikes() { return this.likes; }
 	public boolean getResolved() { return this.resolved; }
+	public UUID getResolvingChild() { return this.resolvingChildID; }
 	
 }
