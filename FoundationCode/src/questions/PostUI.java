@@ -161,6 +161,12 @@ public class PostUI {
         layout.getChildren().clear();
         layout.getChildren().addAll(editBack, titleRow, bodyLabel, replyButton, replyContainer);
         reload();
+        try {
+			StartCSE360.databaseHelper.updateQuestion(question);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private void reload() {
