@@ -72,7 +72,7 @@ public class SetupAccountPage {
             		if(databaseHelper.validateInvitationCode(code)) {
             			
             			// Create a new user and register them in the database
-		            	User user=new User(userName, password, "user");
+		            	User user=new User(userName, password, UserRole.STUDENT);
 		                databaseHelper.register(user);
 		                
 		             // Navigate to the Welcome Login Page

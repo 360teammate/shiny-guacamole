@@ -5,6 +5,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.application.Platform;
+
+import java.util.ArrayList;
+
 import databasePart1.*;
 
 /**
@@ -29,13 +32,13 @@ public class WelcomeLoginPage {
 	    // Button to navigate to the user's respective page based on their role
 	    Button continueButton = new Button("Continue to your Page");
 	    continueButton.setOnAction(a -> {
-	    	String role =user.getRole();
+	    	ArrayList<UserRole> role = user.getRole();
 	    	System.out.println(role);
 	    	
-	    	if(role.equals("admin")) {
+	    	if(role.contains(UserRole.ADMIN)) {
 	    		new AdminHomePage().show(primaryStage);
 	    	}
-	    	else if(role.equals("user")) {
+	    	else if(role.contains(UserRole.STUDENT)) {
 	    		new UserHomePage().show(primaryStage);
 	    	}
 	    });
@@ -48,7 +51,7 @@ public class WelcomeLoginPage {
 	    });
 	    
 	    // "Invite" button for admin to generate invitation codes
-	    if ("admin".equals(user.getRole())) {
+	    if (user.getRole().contains(UserRole.ADMIN)) {
             Button inviteButton = new Button("Invite");
             inviteButton.setOnAction(a -> {
                 new InvitationPage().show(databaseHelper, primaryStage);

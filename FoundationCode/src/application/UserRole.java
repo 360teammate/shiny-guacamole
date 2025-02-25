@@ -40,4 +40,14 @@ public enum UserRole {
 		return this.roleText;
 	}
 	
+	// Convert an integer to a UserRole
+		public static UserRole fromInt(int id) {
+			for (UserRole role : UserRole.values()) {
+				if (role.roleId == id) {
+					return role;
+				}
+			}
+			throw new IllegalArgumentException("Invalid UserRole ID: " + id);
+		}
+	
 } // end UserRole

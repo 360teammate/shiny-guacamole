@@ -6,6 +6,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import databasePart1.*;
 
@@ -43,11 +44,11 @@ public class UserLoginPage {
             String userName = userNameField.getText();
             String password = passwordField.getText();
             try {
-            	User user=new User(userName, password, "");
+            	User user=new User(userName, password, UserRole.NEW_USER);
             	WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage(databaseHelper);
             	
             	// Retrieve the user's role from the database using userName
-            	String role = databaseHelper.getUserRole(userName);
+            	ArrayList<UserRole> role = databaseHelper.getUserRole(userName);
             	
             	if(role!=null) {
             		user.setRole(role);

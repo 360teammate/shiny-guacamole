@@ -7,8 +7,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import application.User;
+import application.UserRole;
 import questions.Answer;
 import questions.Question;
 
@@ -104,7 +106,7 @@ public class DatabaseHelper {
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole());
+			pstmt.setString(3, user.getRole().stream().map(String::valueOf).collect(Collectors.joining(",")));
 			pstmt.executeUpdate();
 		}
 	}
@@ -115,7 +117,7 @@ public class DatabaseHelper {
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole());
+			pstmt.setString(3, user.getRole().stream().map(String::valueOf).collect(Collectors.joining(",")));
 			try (ResultSet rs = pstmt.executeQuery()) {
 				return rs.next();
 			}
@@ -141,19 +143,22 @@ public class DatabaseHelper {
 	}
 	
 	// Retrieves the role of a user from the database using their UserName.
-	public String getUserRole(String userName) {
+	public ArrayList<UserRole> getUserRole(String userName) {
 	    String query = "SELECT role FROM cse360users WHERE userName = ?";
+	    ArrayList<UserRole> roles = new ArrayList<UserRole>();
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
 	        ResultSet rs = pstmt.executeQuery();
 	        
 	        if (rs.next()) {
-	            return rs.getString("role"); // Return the role if user exists
+	        	for (String role : rs.getString("role").split(",")) {
+	        		roles.add(UserRole.fromInt(Integer.parseInt(role)));
+	        	}
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-	    return null; // If no user exists or an error occurs
+	    return roles;
 	}
 	
 	// Generates a new invitation code and inserts it into the database.

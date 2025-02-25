@@ -1,3 +1,6 @@
-/questions/
+/bin/
+/.classpath
+/.gitignore
+/.project
 /application/
 /databasePart1/
