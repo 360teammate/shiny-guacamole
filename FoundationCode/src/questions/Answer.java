@@ -57,7 +57,6 @@ public class Answer {
         // Convert comma-separated child UUIDs into an ArrayList
         for (String uuidStr : children.split(",")) {
             if (!uuidStr.isBlank()) {
-                System.out.println(uuidStr); // Debug output for child UUIDs
                 childrenIDs.add(UUID.fromString(uuidStr));
             }
         }

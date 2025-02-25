@@ -30,13 +30,12 @@ public class PostUI {
         HBox editBack = createEditBackButtons(primaryStage);
         HBox titleRow = createTitleRow();
         bodyLabel = createBodyLabel();
-        Button replyButton = createReplyButton(primaryStage);
         replyContainer = new VBox(10);
         replyContainer.setPadding(new Insets(10, 0, 0, 0));
 
         loadReplies();
 
-        layout.getChildren().addAll(editBack, titleRow, bodyLabel, replyButton, replyContainer);
+        layout.getChildren().addAll(editBack, titleRow, bodyLabel, createReplyInputCard(), replyContainer);
 
         ScrollPane scrollPane = new ScrollPane(layout);
         scrollPane.setFitToWidth(true);
@@ -61,9 +60,6 @@ public class PostUI {
         return label;
     }
 
-    private Button createReplyButton(Stage primaryStage) {
-        return createStyledButton("Reply", e -> layout.getChildren().add(createReplyInputCard()));
-    }
 
     private HBox createTitleRow() {
         titleLabel = new Label(question.getTitle());
@@ -169,7 +165,7 @@ public class PostUI {
 
     private Button createStyledButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> event) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px;");
+        button.setStyle("-fx-background-color: #ccc; -fx-text-fill: black; -fx-border-radius: 5px;");
         button.setOnAction(event);
         return button;
     }

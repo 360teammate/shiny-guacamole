@@ -65,10 +65,8 @@ public class Question {
         this.childrenIDs = new ArrayList<>();
 
         // Convert comma-separated child UUIDs into an ArrayList
-        System.out.println(children); // Debugging output to verify children string
         for (String uuidStr : children.split(",")) {
             if (!uuidStr.isBlank()) {
-                System.out.println(uuidStr); // Debugging output for each child UUID
                 childrenIDs.add(UUID.fromString(uuidStr));
             }
         }
@@ -90,10 +88,8 @@ public class Question {
         this.childrenIDs = new ArrayList<>();
 
         // Convert comma-separated child UUIDs into an ArrayList
-        System.out.println(children); // Debugging output to verify children string
         for (String uuidStr : children.split(",")) {
             if (!uuidStr.isBlank()) {
-                System.out.println(uuidStr); // Debugging output for each child UUID
                 childrenIDs.add(UUID.fromString(uuidStr));
             }
         }
