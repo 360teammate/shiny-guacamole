@@ -78,6 +78,16 @@ public class Question {
         this.likes = likes;
         this.resolved = resolved;
     }
+    
+    /**
+     * Edits the title of the question and updates the edited date.
+     *
+     * @param newTitle The new title of the question.
+     */
+    public void editTitle(String newTitle) {
+        this.title = newTitle;
+        this.editedDate = new Date(); // Update edited timestamp
+    }
 
     /**
      * Edits the body text of the question and updates the edited date.
@@ -106,6 +116,11 @@ public class Question {
     public String getDateAsString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(this.getPostedDate());
+    }
+    
+    public String getEditedDateAsString() {
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+        return dateFormat.format(this.getEditedDate());
     }
 	
 	public UUID getUUID() { return this.uuid; }
