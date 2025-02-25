@@ -202,9 +202,16 @@ public class PostListUI {
 
         Label previewText = new Label(trimBodyText(question.getBodyText(), 100)); // Show preview of body text
         previewText.setStyle("-fx-font-size: 14px;");
-
+        
+        Label checkmark = new Label("Resolved ");
+        checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
+        
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
+        
+        if (question.getResolved()) {
+        	header.getChildren().add(checkmark);
+        }
 
         header.getChildren().add(title);
         Region spacer = new Region();

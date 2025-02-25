@@ -181,6 +181,46 @@ public class PostUI {
         TextArea bodyField = new TextArea(question.getBodyText());
         bodyField.setWrapText(true);
 
+
+        Label bodyLabel = new Label(answer.getBodyText());
+        bodyLabel.setWrapText(true);
+        bodyLabel.setFont(Font.font("Arial", 14));
+        
+        // creates checked reply if answer is resolving child
+        if (answer.getUUID() == question.getResolvingChild()) {
+        	Label checkmark = new Label("Verified Answer");
+        	checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
+        	
+        	VBox replyCard = new VBox(5, authorLabel, bodyLabel,checkmark);
+        	replyCard.setPadding(new Insets(10));
+            replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
+            replyCard.setMaxWidth(Double.MAX_VALUE);
+
+            return replyCard;
+        }
+        
+        
+        	Button resolvesQuestion = new Button("Resolves Question");
+            resolvesQuestion.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white; -fx-border-radius: 5px;");
+            resolvesQuestion.setOnMouseEntered(e -> resolvesQuestion.setStyle("-fx-background-color: #0056b3; -fx-text-fill: white; -fx-border-radius: 5px;"));
+            resolvesQuestion.setOnMouseExited(e -> resolvesQuestion.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white; -fx-border-radius: 5px;"));
+            
+            resolvesQuestion.setOnAction(e -> {
+            	System.out.println("Question resolved by\n" + answer.getBodyText());
+            	question.resolveQuestion(answer.getUUID());
+            });
+            
+            HBox buttonContainer = new HBox(resolvesQuestion);
+            buttonContainer.setAlignment(Pos.CENTER_RIGHT);
+            buttonContainer.setPadding(new Insets(5, 0, 0, 0));
+
+            VBox replyCard = new VBox(5, authorLabel, bodyLabel, buttonContainer);
+            replyCard.setPadding(new Insets(10));
+            replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
+            replyCard.setMaxWidth(Double.MAX_VALUE);
+
+            return replyCard;
+        
         Button saveButton = createStyledButton("Save", e -> {
             question.editTitle(titleField.getText().trim());
             question.editBodyText(bodyField.getText().trim());
