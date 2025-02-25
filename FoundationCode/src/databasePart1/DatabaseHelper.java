@@ -205,7 +205,6 @@ public class DatabaseHelper {
 	    }
 	}
 	
-	// TODO: Insert resolving question into database
     // Insert a question into the database
     public void insertQuestion(Question question) throws SQLException {
         String insertQuery = "INSERT INTO questions (uuid, title, body_text, author, posted_date, edited_date, likes, resolved) "
@@ -252,7 +251,6 @@ public class DatabaseHelper {
     	return stringUUIDs;
     }
     
-    //TODO: Check that it works
     // Update an existing Question in the database
     public void updateQuestion(Question question) throws SQLException {
         String updateQuery = "UPDATE questions SET title = ?, body_text = ?, author = ?, "
@@ -295,7 +293,6 @@ public class DatabaseHelper {
     }
 
     
-    // TODO: MAKE SURE THIS WORKS
     // Retrieve all questions from the database
     public HashMap<UUID, Question> getQuestions() throws SQLException {
         HashMap<UUID, Question> questions = new HashMap<>();
