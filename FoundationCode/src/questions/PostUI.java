@@ -17,16 +17,9 @@ public class PostUI {
     private VBox layout;
     private Label titleLabel;
     private Label bodyLabel;
-    private Label authorDateLabel;
-    private VBox newPost;
-    private HBox editBack;
-    private HBox titleRow;
-    private Button replyButton;
-    private VBox replyInputCard;
 
     public PostUI(Question question) {
         this.question = question;
-        this.replyInputCard = createReplyInputCard();
     }
 
     public void show(Stage primaryStage) {
@@ -34,10 +27,10 @@ public class PostUI {
         layout.setPadding(new Insets(10));
         layout.setStyle("-fx-background-color: #f8f9fa; -fx-border-color: #d3d3d3; -fx-border-width: 1px; -fx-border-radius: 5px;");
 
-        editBack = createEditBackButtons(primaryStage);
-        titleRow = createTitleRow();
+        HBox editBack = createEditBackButtons(primaryStage);
+        HBox titleRow = createTitleRow();
         bodyLabel = createBodyLabel();
-        replyButton = createReplyButton(primaryStage);
+        Button replyButton = createReplyButton(primaryStage);
         replyContainer = new VBox(10);
         replyContainer.setPadding(new Insets(10, 0, 0, 0));
 
@@ -69,28 +62,15 @@ public class PostUI {
     }
 
     private Button createReplyButton(Stage primaryStage) {
-        Button button = createStyledButton("Reply", e -> toggleReplyInput());
-        return button;
-    }
-
-    private void toggleReplyInput() {
-        if (layout.getChildren().contains(replyInputCard)) {
-            layout.getChildren().remove(replyInputCard);
-        } else {
-            layout.getChildren().add(4, replyInputCard);
-        }
+        return createStyledButton("Reply", e -> layout.getChildren().add(createReplyInputCard()));
     }
 
     private HBox createTitleRow() {
         titleLabel = new Label(question.getTitle());
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 22));
         titleLabel.setWrapText(true);
-        
-        if (question.getDateAsString().equals(question.getEditedDateAsString())) {
-        	authorDateLabel = new Label("Posted by " + question.getAuthor() + " on " + question.getDateAsString());
-        } else {
-        	authorDateLabel = new Label("Edited by " + question.getAuthor() + " on " + question.getEditedDateAsString());
-        }
+
+        Label authorDateLabel = new Label("Posted by " + question.getAuthor() + " on " + question.getDateAsString());
         authorDateLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
         authorDateLabel.setStyle("-fx-font-style: italic; -fx-text-fill: gray;");
 
@@ -119,6 +99,24 @@ public class PostUI {
         VBox replyCard = new VBox(5, authorLabel, bodyLabel);
         replyCard.setPadding(new Insets(10));
         replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
+
+        if (answer.getUUID().equals(question.getResolvingChild())) {
+            Label checkmark = new Label("✓ Verified Answer");
+            checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
+            replyCard.getChildren().add(checkmark);
+        } else {
+            Button resolvesQuestion = createStyledButton("Mark as Solution", e -> {
+                question.resolveQuestion(answer.getUUID());
+                try {
+                    StartCSE360.databaseHelper.updateQuestion(question);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                loadReplies();
+            });
+            replyCard.getChildren().add(resolvesQuestion);
+        }
+
         return replyCard;
     }
 
@@ -130,18 +128,16 @@ public class PostUI {
         replyField.setPromptText("Enter your reply...");
         replyField.setWrapText(true);
         replyField.setPrefRowCount(3);
-        replyField.setMaxWidth(Double.MAX_VALUE);
 
         Button commentButton = createStyledButton("Comment", e -> {
             String replyText = replyField.getText().trim();
             if (!replyText.isEmpty()) {
                 UUID answerID = StartCSE360.answers.newAnswer(question, replyText, "User123");
                 question.addChild(answerID);
-                layout.getChildren().remove(replyInputCard);
                 try {
                     StartCSE360.databaseHelper.updateQuestion(question);
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
                 }
                 loadReplies();
                 replyField.clear();
@@ -150,92 +146,30 @@ public class PostUI {
 
         return new VBox(10, replyLabel, replyField, commentButton);
     }
-    
+
     private void edit() {
         layout.getChildren().clear();
-        newPost = createNewPostCard();
-        layout.getChildren().add(newPost);
-    }
-
-    private void save() {
-        layout.getChildren().clear();
-        layout.getChildren().addAll(editBack, titleRow, bodyLabel, replyButton, replyContainer);
-        reload();
-        try {
-			StartCSE360.databaseHelper.updateQuestion(question);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
-
-    private void reload() {
-        titleLabel.setText(question.getTitle());
-        bodyLabel.setText(question.getBodyText());
-        authorDateLabel.setText("Edited by " + question.getAuthor() + " on " + question.getEditedDateAsString());
-        
-    }
-
-    private VBox createNewPostCard() {
         TextField titleField = new TextField(question.getTitle());
         TextArea bodyField = new TextArea(question.getBodyText());
         bodyField.setWrapText(true);
 
-
-        Label bodyLabel = new Label(answer.getBodyText());
-        bodyLabel.setWrapText(true);
-        bodyLabel.setFont(Font.font("Arial", 14));
-        
-        // creates checked reply if answer is resolving child
-        if (answer.getUUID() == question.getResolvingChild()) {
-        	Label checkmark = new Label("Verified Answer");
-        	checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
-        	
-        	VBox replyCard = new VBox(5, authorLabel, bodyLabel,checkmark);
-        	replyCard.setPadding(new Insets(10));
-            replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
-            replyCard.setMaxWidth(Double.MAX_VALUE);
-
-            return replyCard;
-        }
-        
-        
-        	Button resolvesQuestion = new Button("Resolves Question");
-            resolvesQuestion.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white; -fx-border-radius: 5px;");
-            resolvesQuestion.setOnMouseEntered(e -> resolvesQuestion.setStyle("-fx-background-color: #0056b3; -fx-text-fill: white; -fx-border-radius: 5px;"));
-            resolvesQuestion.setOnMouseExited(e -> resolvesQuestion.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white; -fx-border-radius: 5px;"));
-            
-            resolvesQuestion.setOnAction(e -> {
-            	System.out.println("Question resolved by\n" + answer.getBodyText());
-            	question.resolveQuestion(answer.getUUID());
-            });
-            
-            HBox buttonContainer = new HBox(resolvesQuestion);
-            buttonContainer.setAlignment(Pos.CENTER_RIGHT);
-            buttonContainer.setPadding(new Insets(5, 0, 0, 0));
-
-            VBox replyCard = new VBox(5, authorLabel, bodyLabel, buttonContainer);
-            replyCard.setPadding(new Insets(10));
-            replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
-            replyCard.setMaxWidth(Double.MAX_VALUE);
-
-            return replyCard;
-        
         Button saveButton = createStyledButton("Save", e -> {
             question.editTitle(titleField.getText().trim());
             question.editBodyText(bodyField.getText().trim());
-            save();
+            try {
+                StartCSE360.databaseHelper.updateQuestion(question);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            show((Stage) layout.getScene().getWindow());
         });
 
-        return new VBox(10, titleField, bodyField, saveButton);
+        layout.getChildren().addAll(titleField, bodyField, saveButton);
     }
 
-    
     private Button createStyledButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> event) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: #ddd; -fx-text-fill: black; -fx-border-radius: 5px;");
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #ccc; -fx-text-fill: black; -fx-border-radius: 5px;"));
-        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #ddd; -fx-text-fill: black; -fx-border-radius: 5px;"));
+        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px;");
         button.setOnAction(event);
         return button;
     }

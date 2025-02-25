@@ -207,8 +207,10 @@ public class DatabaseHelper {
 	
     // Insert a question into the database
     public void insertQuestion(Question question) throws SQLException {
-        String insertQuery = "INSERT INTO questions (uuid, title, body_text, author, posted_date, edited_date, likes, resolved) "
-                           + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    	System.out.println("Inserting question:" + question.getTitle());
+    	String insertQuery = "INSERT INTO questions (uuid, title, body_text, author, posted_date, edited_date, likes, resolved, resolving_child_uuid) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 
         try (PreparedStatement pstmt = connection.prepareStatement(insertQuery)) {
             pstmt.setString(1, question.getUUID().toString());
@@ -219,6 +221,7 @@ public class DatabaseHelper {
             pstmt.setTimestamp(6, new Timestamp(question.getEditedDate().getTime()));
             pstmt.setInt(7, question.getLikes());
             pstmt.setBoolean(8, question.getResolved());
+            pstmt.setString(9, question.getResolvingChild() != null ? question.getResolvingChild().toString() : "");
             pstmt.executeUpdate();
         }
     }
@@ -266,8 +269,8 @@ public class DatabaseHelper {
             pstmt.setInt(6, question.getLikes());
             pstmt.setBoolean(7, question.getResolved());
             pstmt.setString(8, String.join(",", convertUUIDToString(question.getChildren()))); // Convert list to CSV format
-            pstmt.setString(9, question.getUUID().toString());
-            pstmt.setString(10, (question.getResolvingChild() != null ? question.getResolvingChild().toString() : null));
+            pstmt.setString(9, (question.getResolvingChild() != null ? question.getResolvingChild().toString() : ""));
+            pstmt.setString(10, question.getUUID().toString());
 
             pstmt.executeUpdate();
         }
@@ -291,19 +294,28 @@ public class DatabaseHelper {
             pstmt.executeUpdate();
         }
     }
+    
+    public UUID handleEmpty(String resolvingChild) {
+    	if (resolvingChild.isBlank()) {
+    		return null;
+    	} else {
+    		return UUID.fromString(resolvingChild);
+    	}
+    }
 
     
     // Retrieve all questions from the database
     public HashMap<UUID, Question> getQuestions() throws SQLException {
         HashMap<UUID, Question> questions = new HashMap<>();
         String query = "SELECT * FROM questions";
-
+        
         try (PreparedStatement pstmt = connection.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 Question question = new Question(
-                    UUID.fromString(rs.getString("uuid")),
+                    UUID.fromString(
+                    rs.getString("uuid")),
                     rs.getString("child_uuids"), // Comma-separated child UUIDs
                     rs.getString("title"),
                     rs.getString("body_text"),
@@ -312,10 +324,12 @@ public class DatabaseHelper {
                     rs.getTimestamp("edited_date"),
                     rs.getInt("likes"),
                     rs.getBoolean("resolved"),
-                    UUID.fromString(rs.getString("resolving_child_uuid"))
+                    handleEmpty(rs.getString("resolving_child_uuid"))
                 );
                 questions.put(question.getUUID(), question);
+                System.out.print("Question: " + question.getTitle());
             }
+            System.out.println();
         }
         return questions;
     }
