@@ -36,7 +36,7 @@ public class SetupLoginSelectionPage {
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         layout.getChildren().addAll(setupButton, loginButton);
 
-        primaryStage.setScene(new Scene(layout, 800, 400));
+        primaryStage.setScene(new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT));
         primaryStage.setTitle("Account Setup");
         primaryStage.show();
     }

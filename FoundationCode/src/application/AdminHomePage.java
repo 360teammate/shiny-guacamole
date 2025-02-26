@@ -27,7 +27,7 @@ public class AdminHomePage {
 	    adminLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
 	    layout.getChildren().add(adminLabel);
-	    Scene adminScene = new Scene(layout, 800, 400);
+	    Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
 
 	    // Set the scene to primary stage
 	    primaryStage.setScene(adminScene);

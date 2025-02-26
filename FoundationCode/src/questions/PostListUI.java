@@ -2,6 +2,7 @@ package questions;
 
 import java.util.*;
 
+import application.StartCSE360;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -75,7 +76,7 @@ public class PostListUI {
         scrollPane.setStyle("-fx-background: #f8f9fa; -fx-border-color: transparent;");
 
         // Scene Setup
-        Scene scene = new Scene(scrollPane, 800, 500);
+        Scene scene = new Scene(scrollPane, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setTitle("Post List");
         primaryStage.setScene(scene);
         primaryStage.show();

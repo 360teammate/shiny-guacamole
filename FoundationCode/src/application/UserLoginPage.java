@@ -75,7 +75,7 @@ public class UserLoginPage {
         layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
         layout.getChildren().addAll(userNameField, passwordField, loginButton, errorLabel);
 
-        primaryStage.setScene(new Scene(layout, 800, 400));
+        primaryStage.setScene(new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT));
         primaryStage.setTitle("User Login");
         primaryStage.show();
     }

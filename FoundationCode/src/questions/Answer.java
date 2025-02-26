@@ -96,6 +96,11 @@ public class Answer {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(this.getPostedDate());
     }
+    
+    public String getEditedDateAsString() {
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+        return dateFormat.format(this.getEditedDate());
+    }
 	
 	public UUID getUUID() { return this.uuid; }
 	public ArrayList<UUID> getChildren() { return this.childrenIDs; }

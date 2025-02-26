@@ -41,7 +41,7 @@ public class PostUI {
         scrollPane.setFitToWidth(true);
         scrollPane.setPadding(new Insets(10));
 
-        Scene scene = new Scene(scrollPane, 800, 400);
+        Scene scene = new Scene(scrollPane, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setTitle(question.getTitle());
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -59,7 +59,6 @@ public class PostUI {
         label.setWrapText(true);
         return label;
     }
-
 
     private HBox createTitleRow() {
         titleLabel = new Label(question.getTitle());
@@ -85,17 +84,37 @@ public class PostUI {
     }
 
     private VBox createReplyCard(Answer answer) {
-        Label authorLabel = new Label("Reply by " + answer.getAuthor() + " on " + answer.getDateAsString());
+    	Label authorLabel = new Label("Edited by " + answer.getAuthor() + " on " + answer.getEditedDateAsString());
+    	if (answer.getDateAsString().equals(answer.getEditedDateAsString())) {
+    		authorLabel.setText("Reply by " + answer.getAuthor() + " on " + answer.getDateAsString());
+    	}
         authorLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: gray; -fx-font-style: italic;");
 
         Label bodyLabel = new Label(answer.getBodyText());
         bodyLabel.setWrapText(true);
         bodyLabel.setFont(Font.font("Arial", 14));
-
+        
+        TextArea editField = new TextArea(answer.getBodyText());
+        editField.setWrapText(true);
+        
+        Button saveButton = createStyledButton("Save", e -> {
+            answer.editBodyText(editField.getText().trim());
+            try {
+                StartCSE360.databaseHelper.updateAnswer(answer);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            loadReplies();
+        });
+        
         VBox replyCard = new VBox(5, authorLabel, bodyLabel);
         replyCard.setPadding(new Insets(10));
         replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
-
+        
+        Button editAnswer = createStyledButton("Edit", e -> {
+            replyCard.getChildren().setAll(authorLabel, editField, saveButton);
+        });
+        
         if (answer.getUUID().equals(question.getResolvingChild())) {
             Label checkmark = new Label("✓ Verified Answer");
             checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
@@ -112,8 +131,29 @@ public class PostUI {
             });
             replyCard.getChildren().add(resolvesQuestion);
         }
-
+        
+        replyCard.getChildren().add(editAnswer);
         return replyCard;
+    }
+    
+    private void edit() {
+        layout.getChildren().clear();
+        TextField titleField = new TextField(question.getTitle());
+        TextArea bodyField = new TextArea(question.getBodyText());
+        bodyField.setWrapText(true);
+
+        Button saveButton = createStyledButton("Save", e -> {
+            question.editTitle(titleField.getText().trim());
+            question.editBodyText(bodyField.getText().trim());
+            try {
+                StartCSE360.databaseHelper.updateQuestion(question);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            show((Stage) layout.getScene().getWindow());
+        });
+
+        layout.getChildren().addAll(titleField, bodyField, saveButton);
     }
 
     private VBox createReplyInputCard() {
@@ -141,26 +181,6 @@ public class PostUI {
         });
 
         return new VBox(10, replyLabel, replyField, commentButton);
-    }
-
-    private void edit() {
-        layout.getChildren().clear();
-        TextField titleField = new TextField(question.getTitle());
-        TextArea bodyField = new TextArea(question.getBodyText());
-        bodyField.setWrapText(true);
-
-        Button saveButton = createStyledButton("Save", e -> {
-            question.editTitle(titleField.getText().trim());
-            question.editBodyText(bodyField.getText().trim());
-            try {
-                StartCSE360.databaseHelper.updateQuestion(question);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            show((Stage) layout.getScene().getWindow());
-        });
-
-        layout.getChildren().addAll(titleField, bodyField, saveButton);
     }
 
     private Button createStyledButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> event) {

@@ -60,7 +60,7 @@ public class WelcomeLoginPage {
         }
 
 	    layout.getChildren().addAll(welcomeLabel,continueButton,quitButton);
-	    Scene welcomeScene = new Scene(layout, 800, 400);
+	    Scene welcomeScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
 
 	    // Set the scene to primary stage
 	    primaryStage.setScene(welcomeScene);

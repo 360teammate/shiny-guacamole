@@ -20,7 +20,7 @@ public class UserHomePage {
 	    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
 	    layout.getChildren().add(userLabel);
-	    Scene userScene = new Scene(layout, 800, 400);
+	    Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
 
 	    // Set the scene to primary stage
 	    primaryStage.setScene(userScene);
