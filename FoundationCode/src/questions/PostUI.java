@@ -48,8 +48,8 @@ public class PostUI {
     }
 
     private HBox createEditBackButtons(Stage primaryStage) {
-        Button backButton = createStyledButton("← Back", e -> new PostListUI(StartCSE360.questions).show(primaryStage));
-        Button editButton = createStyledButton("Edit", e -> edit());
+        Button backButton = createStyledButton("← Back", "#ddd", e -> new PostListUI(StartCSE360.questions).show(primaryStage));
+        Button editButton = createStyledButton("Edit", "#ddd", e -> edit());
         return new HBox(10, backButton, editButton);
     }
 
@@ -97,7 +97,7 @@ public class PostUI {
         TextArea editField = new TextArea(answer.getBodyText());
         editField.setWrapText(true);
         
-        Button saveButton = createStyledButton("Save", e -> {
+        Button saveButton = createStyledButton("Save", "#4169E1", e -> {
             answer.editBodyText(editField.getText().trim());
             try {
                 StartCSE360.databaseHelper.updateAnswer(answer);
@@ -111,16 +111,19 @@ public class PostUI {
         replyCard.setPadding(new Insets(10));
         replyCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
         
-        Button editAnswer = createStyledButton("Edit", e -> {
+        
+        Button editAnswer = createStyledButton("Edit", "#ddd", e -> {
             replyCard.getChildren().setAll(authorLabel, editField, saveButton);
         });
+        
+        HBox interactions = new HBox(10, editAnswer);
         
         if (answer.getUUID().equals(question.getResolvingChild())) {
             Label checkmark = new Label("✓ Verified Answer");
             checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
-            replyCard.getChildren().add(checkmark);
+            interactions.getChildren().add(checkmark);
         } else {
-            Button resolvesQuestion = createStyledButton("Mark as Solution", e -> {
+            Button resolvesQuestion = createStyledButton("Mark as Solution", "#4169E1", "white", e -> {
                 question.resolveQuestion(answer.getUUID());
                 try {
                     StartCSE360.databaseHelper.updateQuestion(question);
@@ -129,10 +132,10 @@ public class PostUI {
                 }
                 loadReplies();
             });
-            replyCard.getChildren().add(resolvesQuestion);
+            interactions.getChildren().add(resolvesQuestion);
         }
         
-        replyCard.getChildren().add(editAnswer);
+        replyCard.getChildren().add(interactions);
         return replyCard;
     }
     
@@ -142,7 +145,7 @@ public class PostUI {
         TextArea bodyField = new TextArea(question.getBodyText());
         bodyField.setWrapText(true);
 
-        Button saveButton = createStyledButton("Save", e -> {
+        Button saveButton = createStyledButton("Save", "#4169E1", e -> {
             question.editTitle(titleField.getText().trim());
             question.editBodyText(bodyField.getText().trim());
             try {
@@ -165,7 +168,7 @@ public class PostUI {
         replyField.setWrapText(true);
         replyField.setPrefRowCount(3);
 
-        Button commentButton = createStyledButton("Comment", e -> {
+        Button commentButton = createStyledButton("Comment", "#ddd", e -> {
             String replyText = replyField.getText().trim();
             if (!replyText.isEmpty()) {
                 UUID answerID = StartCSE360.answers.newAnswer(question, replyText, "User123");
@@ -183,9 +186,16 @@ public class PostUI {
         return new VBox(10, replyLabel, replyField, commentButton);
     }
 
-    private Button createStyledButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> event) {
+    private Button createStyledButton(String text, String color, javafx.event.EventHandler<javafx.event.ActionEvent> event) {
         Button button = new Button(text);
-        button.setStyle("-fx-background-color: #ccc; -fx-text-fill: black; -fx-border-radius: 5px;");
+        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: black; -fx-border-radius: 5px;");
+        button.setOnAction(event);
+        return button;
+    }
+    
+    private Button createStyledButton(String text, String color, String textColor, javafx.event.EventHandler<javafx.event.ActionEvent> event) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: " + color + "; -fx-text-fill: " + textColor + "; -fx-border-radius: 5px;");
         button.setOnAction(event);
         return button;
     }
