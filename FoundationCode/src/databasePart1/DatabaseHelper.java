@@ -23,7 +23,7 @@ public class DatabaseHelper {
 
 	// JDBC driver name and database URL 
 	static final String JDBC_DRIVER = "org.h2.Driver";   
-	static final String DB_URL = "jdbc:h2:./database/FoundationDatabase/databasePart1";
+	static final String DB_URL = "jdbc:h2:./src/FoundationCode/databasePart1";
 
 	//  Database credentials 
 	static final String USER = "sa"; 
