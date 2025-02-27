@@ -140,7 +140,9 @@ public class PostListUI {
     		new PostListUI(questionList).show(primaryStage);
     	});
     	
-    	VBox newPostCard = new VBox(10, titleLabel, searchTermField, searchUserField, resolvedFilterComboBox, resetButton, applyButton);
+    	HBox filtering = new HBox(10, resolvedFilterComboBox, resetButton, applyButton);
+    	
+    	VBox newPostCard = new VBox(10, titleLabel, searchTermField, searchUserField, filtering);
         newPostCard.setPadding(new Insets(10));
         newPostCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
         newPostCard.setMaxWidth(Double.MAX_VALUE);

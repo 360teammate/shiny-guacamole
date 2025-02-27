@@ -12,3 +12,5 @@ metadata/
 h2/
 PasswordEvaluatorTestbed/
 UserNameRecognizerConsoleTestbed/
+
+databasePart1.trace.db

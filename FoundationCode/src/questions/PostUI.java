@@ -23,9 +23,12 @@ public class PostUI {
     }
 
     public void show(Stage primaryStage) {
+    	VBox contentBox = new VBox();
+    	contentBox.setSpacing(10);
+    	
         layout = new VBox(10);
         layout.setPadding(new Insets(10));
-        layout.setStyle("-fx-background-color: #f8f9fa; -fx-border-color: #d3d3d3; -fx-border-width: 1px; -fx-border-radius: 5px;");
+        layout.setStyle("-fx-background-color: white; -fx-border-color: #d3d3d3; -fx-border-width: 1px; -fx-border-radius: 5px;");
 
         HBox editBack = createEditBackButtons(primaryStage);
         HBox titleRow = createTitleRow();
@@ -34,10 +37,11 @@ public class PostUI {
         replyContainer.setPadding(new Insets(10, 0, 0, 0));
 
         loadReplies();
+        layout.getChildren().addAll(editBack, titleRow, bodyLabel, createReplyInputCard());
+        
+        contentBox.getChildren().addAll(layout, replyContainer);
 
-        layout.getChildren().addAll(editBack, titleRow, bodyLabel, createReplyInputCard(), replyContainer);
-
-        ScrollPane scrollPane = new ScrollPane(layout);
+        ScrollPane scrollPane = new ScrollPane(contentBox);
         scrollPane.setFitToWidth(true);
         scrollPane.setPadding(new Insets(10));
 
@@ -97,7 +101,7 @@ public class PostUI {
         TextArea editField = new TextArea(answer.getBodyText());
         editField.setWrapText(true);
         
-        Button saveButton = createStyledButton("Save", "#4169E1", e -> {
+        Button saveButton = createStyledButton("Save", "#4169E1", "white", e -> {
             answer.editBodyText(editField.getText().trim());
             try {
                 StartCSE360.databaseHelper.updateAnswer(answer);
@@ -116,7 +120,22 @@ public class PostUI {
             replyCard.getChildren().setAll(authorLabel, editField, saveButton);
         });
         
-        HBox interactions = new HBox(10, editAnswer);
+        TextArea reply = new TextArea();
+        Button saveReply = createStyledButton("Save", "#ddd", e -> {});
+        saveReply.setOnAction(e -> {
+        	UUID answerID = StartCSE360.answers.newAnswer(answer, reply.getText(), "User123");
+            answer.addChild(answerID);
+            replyCard.getChildren().removeAll(reply, saveReply);
+            show((Stage) layout.getScene().getWindow());
+        });
+        
+        Button replyToAnswer = createStyledButton("Reply", "#ddd", e -> {
+        	if (!replyCard.getChildren().contains(reply)) {
+        		replyCard.getChildren().addAll(reply, saveReply);
+        	}
+        });
+        
+        HBox interactions = new HBox(10, replyToAnswer, editAnswer);
         
         if (answer.getUUID().equals(question.getResolvingChild())) {
             Label checkmark = new Label("✓ Verified Answer");
@@ -136,6 +155,10 @@ public class PostUI {
         }
         
         replyCard.getChildren().add(interactions);
+        
+        for (UUID grandchild : answer.getChildren()) {
+        	replyCard.getChildren().addAll(new Region(), createReplyCard(StartCSE360.answers.getAnswer(grandchild)));
+        }
         return replyCard;
     }
     
@@ -145,7 +168,7 @@ public class PostUI {
         TextArea bodyField = new TextArea(question.getBodyText());
         bodyField.setWrapText(true);
 
-        Button saveButton = createStyledButton("Save", "#4169E1", e -> {
+        Button saveButton = createStyledButton("Save", "#4169E1", "white", e -> {
             question.editTitle(titleField.getText().trim());
             question.editBodyText(bodyField.getText().trim());
             try {

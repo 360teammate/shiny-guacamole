@@ -334,7 +334,7 @@ public class DatabaseHelper {
                     handleEmpty(rs.getString("resolving_child_uuid"))
                 );
                 questions.put(question.getUUID(), question);
-                System.out.print("Question: " + question.getTitle());
+                System.out.println("Question: " + question.getTitle());
             }
             System.out.println();
         }
