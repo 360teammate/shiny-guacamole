@@ -3,8 +3,6 @@
 /.classpath
 *.class
 /.class
-*.project
-/.project
 
 bin/
 metadata/
