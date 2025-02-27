@@ -38,9 +38,9 @@ public class DatabaseHelper {
 			Class.forName(JDBC_DRIVER); // Load the JDBC driver
 			System.out.println("Connecting to database...");
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
-			statement = connection.createStatement(); 
+			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
-			// statement.execute("DROP ALL OBJECTS");
+//			statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -53,7 +53,7 @@ public class DatabaseHelper {
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, "
 				+ "password VARCHAR(255), "
-				+ "role VARCHAR(20))";
+				+ "role VARCHAR(225))";
 		statement.execute(userTable);
 		
 		// Create the invitation codes table
@@ -107,7 +107,11 @@ public class DatabaseHelper {
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole().stream().map(String::valueOf).collect(Collectors.joining(",")));
+			pstmt.setString(3, user.getRole().stream()
+					.map(role -> String.valueOf(role.getRoleId()))
+					.collect(Collectors.joining(","))
+			);
+			
 			pstmt.executeUpdate();
 		}
 	}
@@ -118,7 +122,10 @@ public class DatabaseHelper {
 		try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole().stream().map(String::valueOf).collect(Collectors.joining(",")));
+			pstmt.setString(3, user.getRole().stream()
+					.map(role -> String.valueOf(role.getRoleId()))
+					.collect(Collectors.joining(","))
+			);
 			try (ResultSet rs = pstmt.executeQuery()) {
 				return rs.next();
 			}
@@ -154,6 +161,7 @@ public class DatabaseHelper {
 	        if (rs.next()) {
 	        	for (String role : rs.getString("role").split(",")) {
 	        		roles.add(UserRole.fromInt(Integer.parseInt(role)));
+//	        		System.out.println(role);
 	        	}
 	        }
 	    } catch (SQLException e) {
@@ -372,6 +380,23 @@ public class DatabaseHelper {
 		} catch(SQLException se){ 
 			se.printStackTrace(); 
 		} 
+	}
+	
+	// Returns all usernames in arraylist
+	public ArrayList<String> getAllUsernames() {
+	    ArrayList<String> usernames = new ArrayList<>();
+	    String query = "SELECT userName FROM cse360users";
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+	        
+	        while (rs.next()) {
+	            usernames.add(rs.getString("userName"));
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return usernames;
 	}
 
 }
