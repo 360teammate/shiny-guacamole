@@ -20,6 +20,7 @@ public class AdminHomePage {
      * @param primaryStage The primary stage where the scene will be displayed.
      */
     public void show(Stage primaryStage) {
+
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
@@ -49,7 +50,7 @@ public class AdminHomePage {
 
         layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, quitButton);
 
-        Scene adminScene = new Scene(layout, 800, 450);
+        Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(adminScene);
         primaryStage.setTitle("Admin Dashboard");
     }

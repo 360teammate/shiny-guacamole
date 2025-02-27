@@ -34,11 +34,28 @@ public class AnswerList {
      */
     public UUID newAnswer(Question parent, String bodyText, String author) {
         Answer newAnswer = new Answer(UUID.randomUUID(), bodyText, author);
+        
         this.answers.put(newAnswer.getUUID(), newAnswer); // Store the new answer in the HashMap
 
         try {
             // Insert the new answer into the database using the helper class
             StartCSE360.databaseHelper.insertAnswer(newAnswer);
+            StartCSE360.databaseHelper.updateQuestion(parent);
+        } catch (SQLException e) {
+            // Print stack trace for debugging in case of database failure
+            e.printStackTrace();
+        }
+        return newAnswer.getUUID();
+    }
+    
+    public UUID newAnswer(Answer parent, String bodyText, String author) {
+        Answer newAnswer = new Answer(UUID.randomUUID(), bodyText, author);
+        this.answers.put(newAnswer.getUUID(), newAnswer); // Store the new answer in the HashMap
+
+        try {
+            // Insert the new answer into the database using the helper class
+            StartCSE360.databaseHelper.insertAnswer(newAnswer);
+            StartCSE360.databaseHelper.updateAnswer(parent);
         } catch (SQLException e) {
             // Print stack trace for debugging in case of database failure
             e.printStackTrace();

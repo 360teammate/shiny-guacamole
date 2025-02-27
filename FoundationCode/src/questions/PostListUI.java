@@ -2,6 +2,7 @@ package questions;
 
 import java.util.*;
 
+import application.StartCSE360;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -79,7 +80,7 @@ public class PostListUI {
         scrollPane.setStyle("-fx-background: #f8f9fa; -fx-border-color: transparent;");
 
         // Scene Setup
-        Scene scene = new Scene(scrollPane, 800, 500);
+        Scene scene = new Scene(scrollPane, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setTitle("Post List");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -145,7 +146,9 @@ public class PostListUI {
     		new PostListUI(questionList).show(primaryStage);
     	});
     	
-    	VBox newPostCard = new VBox(10, titleLabel, searchTermField, searchUserField, resolvedFilterComboBox, resetButton, applyButton);
+    	HBox filtering = new HBox(10, resolvedFilterComboBox, resetButton, applyButton);
+    	
+    	VBox newPostCard = new VBox(10, titleLabel, searchTermField, searchUserField, filtering);
         newPostCard.setPadding(new Insets(10));
         newPostCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
         newPostCard.setMaxWidth(Double.MAX_VALUE);

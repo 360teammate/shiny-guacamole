@@ -92,6 +92,7 @@ public class WelcomeLoginPage {
                          "-fx-border-radius: 5; -fx-background-radius: 5;";
         }
 
+
         button.setStyle(defaultStyle);
         button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
         button.setOnMouseExited(e -> button.setStyle(defaultStyle));

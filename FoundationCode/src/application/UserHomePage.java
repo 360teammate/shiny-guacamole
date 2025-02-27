@@ -14,6 +14,7 @@ import questions.PostListUI;
  */
 public class UserHomePage {
     public void show(Stage primaryStage) {
+
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
@@ -37,7 +38,7 @@ public class UserHomePage {
 
         layout.getChildren().addAll(title, subtitle, postListButton, quitButton);
 
-        Scene userScene = new Scene(layout, 800, 400);
+        Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(userScene);
         primaryStage.setTitle("User Dashboard");
     }

@@ -1,7 +1,16 @@
 .DS_Store
-.classpath
+*.classpath
+/.classpath
 *.class
+/.class
 *.project
+/.project
 
 bin/
 metadata/
+
+h2/
+PasswordEvaluatorTestbed/
+UserNameRecognizerConsoleTestbed/
+
+databasePart1.trace.db

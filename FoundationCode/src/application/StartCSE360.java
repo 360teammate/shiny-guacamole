@@ -18,6 +18,10 @@ public class StartCSE360 extends Application {
 	public static QuestionList questions;
 	public static AnswerList answers;
 	
+	public static int WIDTH = 1200;
+	public static int HEIGHT = 700;
+	
+	
 	public static void main( String[] args )
 	{
 		launch(args);

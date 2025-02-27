@@ -23,7 +23,7 @@ public class DatabaseHelper {
 
 	// JDBC driver name and database URL 
 	static final String JDBC_DRIVER = "org.h2.Driver";   
-	static final String DB_URL = "jdbc:h2:~/FoundationDatabase";  
+	static final String DB_URL = "jdbc:h2:./src/FoundationCode/databasePart1";
 
 	//  Database credentials 
 	static final String USER = "sa"; 
@@ -108,10 +108,8 @@ public class DatabaseHelper {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getRole().stream()
-					.map(role -> String.valueOf(role.getRoleId()))
-					.collect(Collectors.joining(","))
+					.map(role -> String.valueOf(role.getRoleId())).collect(Collectors.joining(","))
 			);
-			
 			pstmt.executeUpdate();
 		}
 	}
@@ -123,8 +121,7 @@ public class DatabaseHelper {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getRole().stream()
-					.map(role -> String.valueOf(role.getRoleId()))
-					.collect(Collectors.joining(","))
+					.map(role -> String.valueOf(role.getRoleId())).collect(Collectors.joining(","))
 			);
 			try (ResultSet rs = pstmt.executeQuery()) {
 				return rs.next();
@@ -335,7 +332,7 @@ public class DatabaseHelper {
                     handleEmpty(rs.getString("resolving_child_uuid"))
                 );
                 questions.put(question.getUUID(), question);
-                System.out.print("Question: " + question.getTitle());
+                System.out.println("Question: " + question.getTitle());
             }
             System.out.println();
         }

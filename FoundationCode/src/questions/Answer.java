@@ -57,7 +57,6 @@ public class Answer {
         // Convert comma-separated child UUIDs into an ArrayList
         for (String uuidStr : children.split(",")) {
             if (!uuidStr.isBlank()) {
-                System.out.println(uuidStr); // Debug output for child UUIDs
                 childrenIDs.add(UUID.fromString(uuidStr));
             }
         }
@@ -96,6 +95,11 @@ public class Answer {
     public String getDateAsString() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
         return dateFormat.format(this.getPostedDate());
+    }
+    
+    public String getEditedDateAsString() {
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+        return dateFormat.format(this.getEditedDate());
     }
 	
 	public UUID getUUID() { return this.uuid; }

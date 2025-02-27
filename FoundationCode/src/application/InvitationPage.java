@@ -49,9 +49,8 @@ public class InvitationPage {
             new AdminHomePage().show(primaryStage); // Return to Admin Page
         });
 	    
-
         layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel, backButton);
-	    Scene inviteScene = new Scene(layout, 800, 400);
+	    Scene inviteScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
 
 	    // Set the scene to primary stage
 	    primaryStage.setScene(inviteScene);
