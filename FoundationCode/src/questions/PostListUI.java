@@ -10,12 +10,14 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class PostListUI {
-    private QuestionList questionList;
+    private QuestionList questionList; // Stores the list of questions
 
+    // Constructor to init given the question list
     public PostListUI(QuestionList questionList) {
         this.questionList = questionList;
     }
 
+    // Method to display the UI
     public void show(Stage primaryStage) {
         VBox contentBox = new VBox();
         contentBox.setSpacing(10); // Space between sections
@@ -23,7 +25,8 @@ public class PostListUI {
         // ** New Post Creation Card **
         VBox newPostCard = createNewPostCard(primaryStage);
         contentBox.getChildren().add(newPostCard);
-
+        
+        // ** Filter Posts Creation Card **
         VBox filterCard = filterPostCard(primaryStage);
         contentBox.getChildren().add(filterCard);
         
@@ -39,6 +42,7 @@ public class PostListUI {
 
         postListCard.getChildren().add(postListTitle);
 
+        // Check if there are filtered results, otherwise show all posts
         if (this.questionList.getFoundQuestions() != null && this.questionList.getFoundQuestions().size() > 0) {
         	int count = 0;
             for (Question question : this.questionList.getFoundQuestions().values()) {
@@ -81,6 +85,7 @@ public class PostListUI {
         primaryStage.show();
     }
 
+    // Creates the filter post card UI
     private VBox filterPostCard(Stage primaryStage) {
     	Label titleLabel = new Label("Filter Posts");
     	titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
@@ -105,6 +110,7 @@ public class PostListUI {
     		// nothing probably
     	});
     	
+        // Clear/Reset selected filters
     	Button resetButton = new Button("Reset Filters");
     	resetButton.setStyle("-fx-background-color: #CE0000; -fx-text-fill: white; -fx-border-radius: 5px;");
     	resetButton.setOnMouseEntered(e -> resetButton.setStyle("-fx-background-color: #B90000; -fx-text-fill: white; -fx-border-radius: 5px;"));
@@ -149,19 +155,23 @@ public class PostListUI {
     
     // ** Creates a new post creation card **
     private VBox createNewPostCard(Stage primaryStage) {
+        // Title label for the post creation section
         Label titleLabel = new Label("Create a New Post");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        // Text field for entering the post title
         TextField titleField = new TextField();
         titleField.setPromptText("Enter post title...");
         titleField.setMaxWidth(Double.MAX_VALUE);
 
+        // Text area for entering the post body
         TextArea bodyField = new TextArea();
         bodyField.setPromptText("Enter post body...");
         bodyField.setWrapText(true);
         bodyField.setPrefRowCount(3);
         bodyField.setMaxWidth(Double.MAX_VALUE);
 
+        // Button to sibmit the new post
         Button postButton = new Button("Post");
         postButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-border-radius: 5px;");
         postButton.setOnMouseEntered(e -> postButton.setStyle("-fx-background-color: #45A049; -fx-text-fill: white; -fx-border-radius: 5px;"));
@@ -177,6 +187,7 @@ public class PostListUI {
             }
         });
 
+        // Create a VBox container to hold the post creation elements
         VBox newPostCard = new VBox(10, titleLabel, titleField, bodyField, postButton);
         newPostCard.setPadding(new Insets(10));
         newPostCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
@@ -187,6 +198,8 @@ public class PostListUI {
 
     // ** Creates a styled post card with a checkmark for resolved posts **
     private VBox createPostCard(Question question, Stage primaryStage) {
+        
+        // Create and style the title label
         Label title = new Label(question.getTitle());
         title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-cursor: hand;");
         title.setOnMouseEntered(e -> title.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;"));
@@ -197,29 +210,38 @@ public class PostListUI {
             new PostUI(question).show(primaryStage);
         });
 
+        // Create and style the date label
         Label dateLabel = new Label("Posted on " + question.getDateAsString());
         dateLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: gray;");
 
+        // Create a preview of the body text with a character limit
         Label previewText = new Label(trimBodyText(question.getBodyText(), 100)); // Show preview of body text
         previewText.setStyle("-fx-font-size: 14px;");
         
+        // Create a label to indiciate if the post is resolved
         Label checkmark = new Label("Resolved ");
         checkmark.setStyle("-fx-font-size: 18px; -fx-text-fill: green; -fx-font-weight: bold;");
         
+        // Create an HBox to hold the title and resolved checkmark
         HBox header = new HBox();
         header.setAlignment(Pos.CENTER_LEFT);
         
+        // Add checkmark only if the post is resolved
         if (question.getResolved()) {
         	header.getChildren().add(checkmark);
         }
-
+        
+        // Add title to the header
         header.getChildren().add(title);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Region spacer = new Region();        
+        HBox.setHgrow(spacer, Priority.ALWAYS);          
         header.getChildren().addAll(spacer, dateLabel);
 
+        // Create the post card layout using VBox
         VBox postCard = new VBox(5, header, previewText);
         postCard.setPadding(new Insets(10));
+
+        // Apply styling to the post card
         postCard.setStyle("-fx-background-color: white; -fx-border-color: #ddd; -fx-border-radius: 8px; -fx-background-radius: 8px; -fx-padding: 15px;");
         postCard.setMaxWidth(Double.MAX_VALUE);
 
