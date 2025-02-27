@@ -1,69 +1,101 @@
 package application;
 
+import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.application.Platform;
+import databasePart1.*;
 
 import java.util.ArrayList;
-
-import databasePart1.*;
 
 /**
  * The WelcomeLoginPage class displays a welcome screen for authenticated users.
  * It allows users to navigate to their respective pages based on their role or quit the application.
  */
 public class WelcomeLoginPage {
-	
-	private final DatabaseHelper databaseHelper;
+
+    private final DatabaseHelper databaseHelper;
 
     public WelcomeLoginPage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
-    public void show( Stage primaryStage, User user) {
-    	
-    	VBox layout = new VBox(5);
-	    layout.setStyle("-fx-alignment: center; -fx-padding: 20;");
-	    
-	    Label welcomeLabel = new Label("Welcome!!");
-	    welcomeLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-	    
-	    // Button to navigate to the user's respective page based on their role
-	    Button continueButton = new Button("Continue to your Page");
-	    continueButton.setOnAction(a -> {
-	    	ArrayList<UserRole> role = user.getRole();
-	    	System.out.println(role);
-	    	
-	    	if(role.contains(UserRole.ADMIN)) {
-	    		new AdminHomePage().show(primaryStage);
-	    	}
-	    	else if(role.contains(UserRole.STUDENT)) {
-	    		new UserHomePage().show(primaryStage);
-	    	}
-	    });
-	    
-	    // Button to quit the application
-	    Button quitButton = new Button("Quit");
-	    quitButton.setOnAction(a -> {
-	    	databaseHelper.closeConnection();
-	    	Platform.exit(); // Exit the JavaFX application
-	    });
-	    
-	    // "Invite" button for admin to generate invitation codes
-	    if (user.getRole().contains(UserRole.ADMIN)) {
-            Button inviteButton = new Button("Invite");
-            inviteButton.setOnAction(a -> {
-                new InvitationPage().show(databaseHelper, primaryStage);
-            });
-            layout.getChildren().add(inviteButton);
+
+    public void show(Stage primaryStage, User user) {
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
+
+        // Title
+        Label welcomeLabel = new Label("Welcome to the Portal!");
+        welcomeLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+
+        Label subtitle = new Label("Navigate to your respective dashboard");
+        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
+
+        // Buttons
+        Button continueButton = createStyledButton("➡ Continue to Dashboard");
+
+        final ArrayList<UserRole> roles = user.getRole();  
+        continueButton.setOnAction(a -> {
+            System.out.println(roles);
+
+            if (roles.contains(UserRole.ADMIN)) {
+                new AdminHomePage().show(primaryStage);
+            } else if (roles.contains(UserRole.STUDENT)) {
+                new UserHomePage().show(primaryStage);
+            }
+        });
+
+        Button quitButton = createStyledButton("❌ Quit", true);
+        quitButton.setOnAction(a -> {
+            databaseHelper.closeConnection();
+            Platform.exit(); // Exit the JavaFX application
+        });
+
+        layout.getChildren().addAll(welcomeLabel, subtitle, continueButton, quitButton);
+        Scene welcomeScene = new Scene(layout, 800, 450);
+
+        // Set the scene to primary stage
+        primaryStage.setScene(welcomeScene);
+        primaryStage.setTitle("Welcome Page");
+    }
+
+    /**
+     * Helper method to create styled buttons for consistency.
+     */
+    private Button createStyledButton(String text) {
+        return createStyledButton(text, false);
+    }
+
+    private Button createStyledButton(String text, boolean isQuitButton) {
+        Button button = new Button(text);
+
+        final String defaultStyle;
+        final String hoverStyle;
+
+        if (isQuitButton) {
+            defaultStyle = "-fx-font-size: 16px; -fx-padding: 12px 20px; " +
+                           "-fx-background-color: #ff4d4d; -fx-text-fill: white; " +
+                           "-fx-border-radius: 5; -fx-background-radius: 5;";
+            hoverStyle = "-fx-font-size: 16px; -fx-padding: 12px 20px; " +
+                         "-fx-background-color: #cc0000; -fx-text-fill: white; " +
+                         "-fx-border-radius: 5; -fx-background-radius: 5;";
+        } else {
+            defaultStyle = "-fx-font-size: 16px; -fx-padding: 12px 20px; " +
+                           "-fx-background-color: #0078D7; -fx-text-fill: white; " +
+                           "-fx-border-radius: 5; -fx-background-radius: 5;";
+            hoverStyle = "-fx-font-size: 16px; -fx-padding: 12px 20px; " +
+                         "-fx-background-color: #005a9e; -fx-text-fill: white; " +
+                         "-fx-border-radius: 5; -fx-background-radius: 5;";
         }
 
-	    layout.getChildren().addAll(welcomeLabel,continueButton,quitButton);
-	    Scene welcomeScene = new Scene(layout, 800, 400);
+        button.setStyle(defaultStyle);
+        button.setOnMouseEntered(e -> button.setStyle(hoverStyle));
+        button.setOnMouseExited(e -> button.setStyle(defaultStyle));
 
-	    // Set the scene to primary stage
-	    primaryStage.setScene(welcomeScene);
-	    primaryStage.setTitle("Welcome Page");
+        return button;
     }
 }

@@ -41,9 +41,16 @@ public class InvitationPage {
             String invitationCode = databaseHelper.generateInvitationCode();
             inviteCodeLabel.setText(invitationCode);
         });
+        
+        // Back button
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 14px; -fx-padding: 10;");
+        backButton.setOnAction(e -> {
+            new AdminHomePage().show(primaryStage); // Return to Admin Page
+        });
 	    
 
-        layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel);
+        layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel, backButton);
 	    Scene inviteScene = new Scene(layout, 800, 400);
 
 	    // Set the scene to primary stage
