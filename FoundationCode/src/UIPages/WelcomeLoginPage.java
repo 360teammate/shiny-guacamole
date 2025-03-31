@@ -1,4 +1,4 @@
-package Application;
+package UIPages;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -10,9 +10,10 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
+import Application.StartCSE360;
+import Application.User;
+import Application.UserRole;
 import Database.*;
-import UIPages.AdminHomePage;
-import UIPages.UserHomePage;
 
 /**
  * The WelcomeLoginPage class displays a welcome screen for authenticated users.
