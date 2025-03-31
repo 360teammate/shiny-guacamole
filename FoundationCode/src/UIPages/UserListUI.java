@@ -1,10 +1,9 @@
-package adminStuff;
+package UIPages;
 
 import java.util.ArrayList;
 
-import application.AdminHomePage;
-import application.StartCSE360;
-import application.UserRole;
+import Application.StartCSE360;
+import Application.UserRole;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

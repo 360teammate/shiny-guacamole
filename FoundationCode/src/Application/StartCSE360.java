@@ -1,15 +1,14 @@
-package application;
+package Application;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import questions.AnswerList;
-import questions.PostListUI;
-import questions.QuestionList;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
-
-import databasePart1.DatabaseHelper;
+import Database.DatabaseHelper;
+import Questions.AnswerList;
+import Questions.Question;
+import Questions.QuestionList;
+import UIPages.FirstPage;
+import UIPages.SetupLoginSelectionPage;
 
 
 public class StartCSE360 extends Application {
@@ -21,6 +20,9 @@ public class StartCSE360 extends Application {
 	public static int WIDTH = 1200;
 	public static int HEIGHT = 700;
 	
+	public static User loggedInUser;
+	public static Question currentQuestion;
+	
 	
 	public static void main( String[] args )
 	{
@@ -29,17 +31,7 @@ public class StartCSE360 extends Application {
 	
 	@Override
     public void start(Stage primaryStage) {
-//		try {
-//			databaseHelper.connectToDatabase();
-//			
-//			new PostListUI(questions).show(primaryStage);
-//			
-//			
-//		} catch (SQLException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
+
         try {
         	
             databaseHelper.connectToDatabase(); // Connect to the database
@@ -59,3 +51,19 @@ public class StartCSE360 extends Application {
 	
 
 }
+
+// ACCOUNTS:::
+
+// Username: admin
+// Password: adminADMIN111!
+
+// Username: Abram
+// Password: abramABRAM111!
+
+// Username: Brandon
+// Password: brandonBRANDON111!
+
+// Username: Drew
+// Password: drewDREW111!
+
+

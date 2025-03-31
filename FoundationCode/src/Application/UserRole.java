@@ -5,7 +5,7 @@
  * A user can have multiple roles assigned at the same time.
  */
 
-package application;
+package Application;
 
 public enum UserRole {
 	

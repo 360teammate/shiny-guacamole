@@ -1,4 +1,4 @@
-package application;
+package Application;
 
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -7,40 +7,69 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import questions.PostListUI;
+
+import java.util.ArrayList;
+
+import Database.*;
+import UIPages.AdminHomePage;
+import UIPages.UserHomePage;
 
 /**
- * This page displays a simple welcome message for the user.
+ * The WelcomeLoginPage class displays a welcome screen for authenticated users.
+ * It allows users to navigate to their respective pages based on their role or quit the application.
  */
-public class UserHomePage {
-    public void show(Stage primaryStage) {
+public class WelcomeLoginPage {
 
+    private final DatabaseHelper databaseHelper;
+
+    public WelcomeLoginPage(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
+    }
+
+    public void show(Stage primaryStage, User user) {
+    	try {
+			StartCSE360.loggedInUser = user;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
 
         // Title
-        Label title = new Label("User Dashboard");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        Label welcomeLabel = new Label("Welcome to the Portal!");
+        welcomeLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
-        Label subtitle = new Label("Browse and manage your posts");
+        Label subtitle = new Label("Navigate to your respective dashboard");
         subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
 
         // Buttons
-        Button postListButton = createStyledButton("📜 View Posts");
-        postListButton.setOnAction(e -> new PostListUI(StartCSE360.questions).show(primaryStage));
+        Button continueButton = createStyledButton("➡ Continue to Dashboard");
+
+        final ArrayList<UserRole> roles = user.getRole();  
+        continueButton.setOnAction(a -> {
+            System.out.println(roles);
+
+            if (roles.contains(UserRole.ADMIN)) {
+                new AdminHomePage().show(primaryStage);
+            } else if (roles.contains(UserRole.STUDENT)) {
+                new UserHomePage().show(primaryStage);
+            }
+        });
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
-            StartCSE360.databaseHelper.closeConnection();
-            Platform.exit();
+            databaseHelper.closeConnection();
+            Platform.exit(); // Exit the JavaFX application
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, quitButton);
+        layout.getChildren().addAll(welcomeLabel, subtitle, continueButton, quitButton);
+        Scene welcomeScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
 
-        Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
-        primaryStage.setScene(userScene);
-        primaryStage.setTitle("User Dashboard");
+        // Set the scene to primary stage
+        primaryStage.setScene(welcomeScene);
+        primaryStage.setTitle("Welcome Page");
     }
 
     /**
@@ -71,6 +100,7 @@ public class UserHomePage {
                          "-fx-background-color: #005a9e; -fx-text-fill: white; " +
                          "-fx-border-radius: 5; -fx-background-radius: 5;";
         }
+
 
         button.setStyle(defaultStyle);
         button.setOnMouseEntered(e -> button.setStyle(hoverStyle));

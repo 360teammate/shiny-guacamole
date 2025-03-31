@@ -1,11 +1,11 @@
-package application;
+package UIPages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
-import databasePart1.*;
+import Application.StartCSE360;
+import Database.*;
 
 /**
  * The SetupLoginSelectionPage class allows users to choose between setting up a new account

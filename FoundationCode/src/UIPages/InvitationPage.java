@@ -1,7 +1,8 @@
-package application;
+package UIPages;
 
 
-import databasePart1.*;
+import Application.StartCSE360;
+import Database.*;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

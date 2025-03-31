@@ -1,4 +1,4 @@
-package databasePart1;
+package Database;
 import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import application.User;
-import application.UserRole;
-import questions.Answer;
-import questions.Question;
+import Application.User;
+import Application.UserRole;
+import Questions.Answer;
+import Questions.Question;
 
 
 /**
@@ -23,7 +23,7 @@ public class DatabaseHelper {
 
 	// JDBC driver name and database URL 
 	static final String JDBC_DRIVER = "org.h2.Driver";   
-	static final String DB_URL = "jdbc:h2:./src/FoundationCode/databasePart1";
+	static final String DB_URL = "jdbc:h2:./src/Database/databasePart1";
 
 	//  Database credentials 
 	static final String USER = "sa"; 
@@ -40,7 +40,7 @@ public class DatabaseHelper {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
-			statement.execute("DROP ALL OBJECTS");
+//			statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {

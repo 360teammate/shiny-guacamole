@@ -1,4 +1,4 @@
-package application;
+package UIPages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -7,7 +7,13 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
-import databasePart1.*;
+import Application.PasswordEvaluator;
+import Application.StartCSE360;
+import Application.User;
+import Application.UserNameRecognizer;
+import Application.UserRole;
+import Application.WelcomeLoginPage;
+import Database.*;
 
 /**
  * The SetupAdmin class handles the setup process for creating an administrator account.

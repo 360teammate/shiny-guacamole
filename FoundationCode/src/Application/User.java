@@ -1,4 +1,4 @@
-package application;
+package Application;
 
 import java.util.ArrayList;
 
@@ -28,8 +28,3 @@ public class User {
     public String getPassword() { return password; }
     public ArrayList<UserRole> getRole() { return role; }
 }
-
-// admin
-//	abram 12345
-// invite
-//	b163

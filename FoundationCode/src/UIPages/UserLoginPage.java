@@ -1,4 +1,4 @@
-package application;
+package UIPages;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -8,7 +8,11 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import databasePart1.*;
+import Application.StartCSE360;
+import Application.User;
+import Application.UserRole;
+import Application.WelcomeLoginPage;
+import Database.*;
 
 /**
  * The UserLoginPage class provides a login interface for users to access their accounts.

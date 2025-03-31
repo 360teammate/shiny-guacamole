@@ -1,5 +1,6 @@
-package application;
+package UIPages;
 
+import Application.StartCSE360;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,18 +8,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import questions.PostListUI;
-import adminStuff.UserListUI;
 
 /**
- * AdminHomePage class represents the user interface for the admin user.
- * This page provides navigation for managing users, posts, and invites.
+ * This page displays a simple welcome message for the user.
  */
-public class AdminHomePage {
-    /**
-     * Displays the admin page in the provided primary stage.
-     * @param primaryStage The primary stage where the scene will be displayed.
-     */
+public class UserHomePage {
     public void show(Stage primaryStage) {
 
         VBox layout = new VBox(20);
@@ -26,21 +20,15 @@ public class AdminHomePage {
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
 
         // Title
-        Label title = new Label("Admin Dashboard");
+        Label title = new Label("User Dashboard");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
-        Label subtitle = new Label("Manage users, posts, and invites");
+        Label subtitle = new Label("Browse and manage your posts");
         subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
 
         // Buttons
         Button postListButton = createStyledButton("📜 View Posts");
-        postListButton.setOnAction(e -> new PostListUI(StartCSE360.questions).show(primaryStage));
-
-        Button userListButton = createStyledButton("👥 User List");
-        userListButton.setOnAction(e -> new UserListUI().show(primaryStage));
-
-        Button inviteButton = createStyledButton("✉ Send Invite");
-        inviteButton.setOnAction(e -> new InvitationPage().show(StartCSE360.databaseHelper, primaryStage));
+        postListButton.setOnAction(e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
@@ -48,11 +36,11 @@ public class AdminHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, quitButton);
 
-        Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
-        primaryStage.setScene(adminScene);
-        primaryStage.setTitle("Admin Dashboard");
+        Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
+        primaryStage.setScene(userScene);
+        primaryStage.setTitle("User Dashboard");
     }
 
     /**
@@ -90,5 +78,4 @@ public class AdminHomePage {
 
         return button;
     }
-
 }

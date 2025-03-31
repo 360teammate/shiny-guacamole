@@ -1,11 +1,11 @@
-package questions;
+package Questions;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import application.StartCSE360; // Importing the main application class, likely containing the database helper
+import Application.StartCSE360;
 
 /**
  * Manages a collection of questions, providing methods to add, edit, delete, 
@@ -117,7 +117,6 @@ public class QuestionList {
      * @param term A target String to find within all the questions
      * @return The resulting query subset 
      */
-    @Deprecated
     private HashMap<UUID, Question> searchForQuestion(String term) {
     	this.questionsSubset = new HashMap<>();
     	// iterate through all entries in all questions map
@@ -138,7 +137,6 @@ public class QuestionList {
      * @param username The target person to be searching for
      * @return The resulting query subset
      */
-    @Deprecated
     private HashMap<UUID, Question> searchForAuthor(String username) {
     	this.questionsSubset = new HashMap<>();
     	// iterate through all entries in all questions map
@@ -158,7 +156,6 @@ public class QuestionList {
      * @param state Searches for a subset of questions with a resolved status of state.
      * @return The resulting query subset
      */
-    @Deprecated
     private HashMap<UUID, Question> getAnsweredQuestions(boolean state) {
     	this.questionsSubset = new HashMap<>();
     	for (Map.Entry<UUID, Question> entry : this.questions.entrySet()) {

@@ -1,10 +1,10 @@
-package questions;
+package Questions;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 
-import application.StartCSE360; // Importing main application class, likely containing the database helper
+import Application.StartCSE360;
 
 /**
  * Manages a collection of answers, providing methods to add, edit, delete, 
