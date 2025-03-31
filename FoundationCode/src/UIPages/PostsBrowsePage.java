@@ -1,9 +1,10 @@
 package UIPages;
 
 import java.util.*;
+
+import Application.Question;
+import Application.QuestionList;
 import Application.StartCSE360;
-import Questions.Question;
-import Questions.QuestionList;
 import UIComponents.*;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;

@@ -1,6 +1,6 @@
 package UIComponents;
 
-import Questions.Question;
+import Application.Question;
 import UIPages.PostPage;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;

@@ -1,6 +1,6 @@
 package UIComponents;
 
-import Questions.QuestionList;
+import Application.QuestionList;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;

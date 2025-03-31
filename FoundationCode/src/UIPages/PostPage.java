@@ -2,8 +2,8 @@ package UIPages;
 
 import java.util.UUID;
 
+import Application.Question;
 import Application.StartCSE360;
-import Questions.Question;
 import UIComponents.QuestionCard;
 import UIComponents.ReplyThreadCard;
 import javafx.geometry.Insets;

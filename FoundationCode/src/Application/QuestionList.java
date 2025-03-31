@@ -1,11 +1,9 @@
-package Questions;
+package Application;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import Application.StartCSE360;
 
 /**
  * Manages a collection of questions, providing methods to add, edit, delete, 

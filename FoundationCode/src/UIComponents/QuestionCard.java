@@ -1,7 +1,7 @@
 package UIComponents;
 
-import Questions.Question;
 import UIPages.PostsBrowsePage;
+import Application.Question;
 import Application.StartCSE360;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

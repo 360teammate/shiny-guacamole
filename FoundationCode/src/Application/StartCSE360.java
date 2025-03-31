@@ -4,9 +4,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import java.sql.SQLException;
 import Database.DatabaseHelper;
-import Questions.AnswerList;
-import Questions.Question;
-import Questions.QuestionList;
 import UIPages.FirstPage;
 import UIPages.SetupLoginSelectionPage;
 

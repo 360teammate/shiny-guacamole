@@ -1,9 +1,9 @@
 package UIComponents;
 
+import Application.Answer;
+import Application.Question;
 import Application.StartCSE360;
 import Application.UserRole;
-import Questions.Answer;
-import Questions.Question;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
