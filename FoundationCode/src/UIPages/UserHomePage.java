@@ -1,6 +1,7 @@
 package UIPages;
 
 import Application.StartCSE360;
+import Database.DatabaseHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,6 +14,13 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 public class UserHomePage {
+	
+	private final DatabaseHelper databaseHelper;
+
+    public UserHomePage(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
+    }
+	
     public void show(Stage primaryStage) {
 
         VBox layout = new VBox(20);

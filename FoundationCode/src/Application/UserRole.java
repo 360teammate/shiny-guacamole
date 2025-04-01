@@ -41,13 +41,13 @@ public enum UserRole {
 	}
 	
 	// Convert an integer to a UserRole
-		public static UserRole fromInt(int id) {
-			for (UserRole role : UserRole.values()) {
-				if (role.roleId == id) {
-					return role;
-				}
+	public static UserRole fromInt(int id) {
+		for (UserRole role : UserRole.values()) {
+			if (role.roleId == id) {
+				return role;
 			}
-			throw new IllegalArgumentException("Invalid UserRole ID: " + id);
 		}
+		throw new IllegalArgumentException("Invalid UserRole ID: " + id);
+	}
 	
 } // end UserRole
