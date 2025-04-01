@@ -47,7 +47,7 @@ public class InvitationPage {
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 14px; -fx-padding: 10;");
         backButton.setOnAction(e -> {
-            new AdminHomePage().show(primaryStage); // Return to Admin Page
+            new AdminHomePage(databaseHelper).show(primaryStage); // Return to Admin Page
         });
 	    
         layout.getChildren().addAll(userLabel, showCodeButton, inviteCodeLabel, backButton);

@@ -52,9 +52,9 @@ public class WelcomeLoginPage {
             System.out.println(roles);
 
             if (roles.contains(UserRole.ADMIN)) {
-                new AdminHomePage().show(primaryStage);
+                new AdminHomePage(databaseHelper).show(primaryStage);
             } else if (roles.contains(UserRole.STUDENT)) {
-                new UserHomePage().show(primaryStage);
+                new UserHomePage(databaseHelper).show(primaryStage);
             }
         });
 

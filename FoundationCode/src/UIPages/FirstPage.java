@@ -36,8 +36,7 @@ public class FirstPage {
 	    // Button to navigate to the SetupAdmin page
 	    
 	    continueButton.setOnAction(a -> {
-	        new AdminSetupPage(databaseHelper).show(primaryStage);
-	        
+	        new AdminSetupPage(databaseHelper).show(primaryStage);	        
 	    });
 
 	    layout.getChildren().addAll(userLabel, continueButton);

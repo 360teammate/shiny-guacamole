@@ -1,6 +1,7 @@
 package UIPages;
 
 import Application.StartCSE360;
+import Database.DatabaseHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,6 +19,13 @@ public class AdminHomePage {
      * Displays the admin page in the provided primary stage.
      * @param primaryStage The primary stage where the scene will be displayed.
      */
+	
+	private final DatabaseHelper databaseHelper;
+
+    public AdminHomePage(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
+    }
+	
     public void show(Stage primaryStage) {
 
         VBox layout = new VBox(20);
@@ -36,7 +44,7 @@ public class AdminHomePage {
         postListButton.setOnAction(e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
 
         Button userListButton = createStyledButton("👥 User List");
-        userListButton.setOnAction(e -> new UserListUI().show(primaryStage));
+        userListButton.setOnAction(e -> new UserListPage(databaseHelper).show(primaryStage));
 
         Button inviteButton = createStyledButton("✉ Send Invite");
         inviteButton.setOnAction(e -> new InvitationPage().show(StartCSE360.databaseHelper, primaryStage));
@@ -89,5 +97,8 @@ public class AdminHomePage {
 
         return button;
     }
+    
+    
+
 
 }

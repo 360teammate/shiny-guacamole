@@ -147,6 +147,8 @@ public class DatabaseHelper {
 	    return false; // If an error occurs, assume user doesn't exist
 	}
 	
+	
+	
 	// Retrieves the role of a user from the database using their UserName.
 	public ArrayList<UserRole> getUserRole(String userName) {
 	    String query = "SELECT role FROM cse360users WHERE userName = ?";
@@ -395,5 +397,20 @@ public class DatabaseHelper {
 	    }
 	    return usernames;
 	}
+	
+	public void updateUserRoles(String userName, ArrayList<UserRole> newRoles) throws SQLException {
+	    String updateQuery = "UPDATE cse360users SET role = ? WHERE userName = ?";
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+	        String rolesString = newRoles.stream()
+	                .map(role -> String.valueOf(role.getRoleId())) // Convert each role to its ID
+	                .collect(Collectors.joining(",")); // Join IDs with commas
+	        
+	        pstmt.setString(1, rolesString);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
+
 
 }

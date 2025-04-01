@@ -12,7 +12,7 @@ public class User {
     private ArrayList<UserRole> role;
 
     // Constructor to initialize a new User object with userName, password, and role.
-    public User( String userName, String password, UserRole role) {
+    public User(String userName, String password, UserRole role) {
         this.userName = userName;
         this.password = password;
         this.role = new ArrayList<UserRole>();
@@ -20,8 +20,9 @@ public class User {
     }
     
     // Sets the role of the user.
-    public void setRole(ArrayList<UserRole> role) {
-    	this.role=role;
+    public void setRole(ArrayList<UserRole> newRoles) {	
+
+    	this.role=newRoles;
     }
 
     public String getUserName() { return userName; }
