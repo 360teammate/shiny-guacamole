@@ -11,12 +11,34 @@ public class User {
     private String password;
     private ArrayList<UserRole> role;
 
+    private int[] reviewerRatings;	// is used if they have a reviewer role, out of 5 stars
+    
     // Constructor to initialize a new User object with userName, password, and role.
     public User(String userName, String password, UserRole role) {
         this.userName = userName;
         this.password = password;
         this.role = new ArrayList<UserRole>();
         this.role.add(role);
+        
+        this.reviewerRatings = new int[5];
+    }
+    
+    public int[] getRatings() {
+    	return this.reviewerRatings;
+    }
+    
+    public void addRating(int value) {
+    	this.reviewerRatings[value - 1]++;
+    }
+    
+    public double getRatingAverage() {
+    	double sum = 0.0;
+    	int totalReviews = 0;
+    	for (int i = 0; i < this.reviewerRatings.length; i++) {
+    		sum += reviewerRatings[i] * (i + 1);
+    		totalReviews += reviewerRatings[i];
+    	}
+    	return sum / totalReviews;
     }
     
     // Sets the role of the user.

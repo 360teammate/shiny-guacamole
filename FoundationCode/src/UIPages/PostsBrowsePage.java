@@ -26,6 +26,7 @@ public class PostsBrowsePage {
 
         // === Top Cards ===
         contentBox.getChildren().addAll(
+        	new ReviewerLeaderboardCard(primaryStage),
             new CreateQuestionCard(questionList, primaryStage),
             new FilterCard(questionList, primaryStage)
         );
@@ -62,9 +63,10 @@ public class PostsBrowsePage {
     }
 
     private Map<UUID, Question> getFilteredOrAllQuestions() {
-        if (questionList.getFoundQuestions() != null && !questionList.getFoundQuestions().isEmpty()) {
+        if (questionList.getFoundQuestions() != null) { // && !questionList.getFoundQuestions().isEmpty()) {
             return questionList.getFoundQuestions();
         } else {
+        	questionList.clearFoundQuestions();
             return questionList.getAllQuestions();
         }
     }
