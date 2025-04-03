@@ -13,11 +13,11 @@ import javafx.stage.Stage;
 /**
  * This page displays a simple welcome message for the user.
  */
-public class UserHomePage {
+public class ReviewerHomePage {
 	
 	private final DatabaseHelper databaseHelper;
 
-    public UserHomePage(DatabaseHelper databaseHelper) {
+    public ReviewerHomePage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
 	
@@ -28,7 +28,7 @@ public class UserHomePage {
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
 
         // Title
-        Label title = new Label("User Dashboard");
+        Label title = new Label("Reviewer Dashboard");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
         Label subtitle = new Label("Browse and manage your posts");
@@ -47,7 +47,7 @@ public class UserHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, reviewerListButton, quitButton);
 
         Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(userScene);
