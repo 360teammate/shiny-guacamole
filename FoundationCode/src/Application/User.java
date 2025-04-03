@@ -19,6 +19,12 @@ public class User {
         this.role.add(role);
     }
     
+    public User(String userName, String password, ArrayList<UserRole> role) {
+        this.userName = userName;
+        this.password = password;
+        this.role = role;
+    }
+    
     // Sets the role of the user.
     public void setRole(ArrayList<UserRole> newRoles) {	
 

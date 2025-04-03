@@ -40,6 +40,18 @@ public class RequestsPage {
     }
 
     public void show(Stage primaryStage) {
+    	
+    	ArrayList<User> test;
+		try {
+			test = databaseHelper.getPendingRequests();
+	    	for (User author : test) {
+	    		System.out.println(author.getUserName());
+	    	}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");

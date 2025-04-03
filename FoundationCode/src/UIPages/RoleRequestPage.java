@@ -47,7 +47,7 @@ public class RoleRequestPage {
 				requestField.setText("Request Sent");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				requestField.setText("Request failed");
+				requestField.setText(e.getMessage());
 				e.printStackTrace();
 			}
         });
