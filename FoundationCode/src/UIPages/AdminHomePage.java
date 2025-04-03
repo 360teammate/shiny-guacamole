@@ -48,6 +48,9 @@ public class AdminHomePage {
 
         Button inviteButton = createStyledButton("✉ Send Invite");
         inviteButton.setOnAction(e -> new InvitationPage().show(StartCSE360.databaseHelper, primaryStage));
+        
+        Button roleRequestButton = createStyledButton("Manage Role Requests");
+        roleRequestButton.setOnAction(e -> new RequestsPage(StartCSE360.databaseHelper).show(primaryStage));
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
@@ -55,7 +58,7 @@ public class AdminHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, roleRequestButton, quitButton);
 
         Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(adminScene);

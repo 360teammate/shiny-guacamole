@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import Application.Answer;
 import Application.Question;
+import Application.RoleRequest;
 import Application.User;
 import Application.UserRole;
 
@@ -85,6 +86,13 @@ public class DatabaseHelper {
 	            + "likes INT DEFAULT 0, "
 	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
 	    statement.execute(createAnswersTable);
+	    
+	    String createRoleRequestTable = "CREATE TABLE IF NOT EXISTS RoleRequest ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "author VARCHAR(255) NOT NULL, "
+	            + "requestText TEXT NOT NULL, "
+	            + "requestedRole INT NOT NULL)";
+	    statement.execute(createRoleRequestTable);
 
 
 	    
@@ -364,6 +372,37 @@ public class DatabaseHelper {
             }
         }
         return answers;
+    }
+    
+    public void insertRoleRequest(String author, String requestText, UserRole requestedRole) throws SQLException {
+        String insertQuery = "INSERT INTO RoleRequest (author, requestText, requestedRole) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+            preparedStatement.setString(1, author);
+            preparedStatement.setString(2, requestText);
+            preparedStatement.setInt(3, requestedRole.getRoleId()); // Store roleId instead of a string
+            preparedStatement.executeUpdate();
+        }
+    }
+    
+    public ArrayList<RoleRequest> getRoleRequests() throws SQLException {
+        String query = "SELECT id, author, requestText, requestedRole FROM RoleRequest";
+        ArrayList<RoleRequest> requests = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String author = resultSet.getString("author");
+                String requestText = resultSet.getString("requestText");
+                int roleId = resultSet.getInt("requestedRole");
+
+                UserRole role = UserRole.fromInt(roleId); // Convert int back to UserRole enum
+                requests.add(new RoleRequest(author, requestText, role));
+            }
+        }
+        return requests;
     }
 
 
