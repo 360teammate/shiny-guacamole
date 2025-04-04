@@ -23,6 +23,7 @@ public class User {
     	// TODO get password, roles, and conversations from the database
     }
 
+    private ArrayList<String> raters;
     private int[] reviewerRatings;	// is used if they have a reviewer role, out of 5 stars
     
     // Constructor to initialize a new User object with userName, password, and role.
@@ -31,8 +32,9 @@ public class User {
         this.password = password;
         this.role = role;
         
+        this.raters = new ArrayList<>();
+        this.raters.add(userName);
         this.reviewerRatings = new int[5];
-        this.role = role;
         
         this.conversations = new HashMap<>();
 
@@ -57,6 +59,20 @@ public class User {
         }
     }
     
+    public ArrayList<String> getRaters() {
+    	return this.raters;
+    }
+    
+    public void addRater(String name) {
+    	this.raters.add(name);
+    	StartCSE360.databaseHelper.updateRaters(userName, name);
+    }
+    
+    public void setRaters(ArrayList<String> r) {
+    	this.raters = r;
+    	// StartCSE360.databaseHelper.updateRaters(userName, password);
+    }
+    
     public void setRatings(int[] r) {
     	this.reviewerRatings = r;
     }
@@ -65,8 +81,9 @@ public class User {
     	return this.reviewerRatings;
     }
 
-    public boolean addRating(String rater, int value) {
+    public boolean addRating(int value) {
     	this.reviewerRatings[value - 1]++;
+    	StartCSE360.databaseHelper.updateUserRatings(userName, value - 1);
     	return true;
     }
     

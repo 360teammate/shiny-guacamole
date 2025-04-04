@@ -36,9 +36,9 @@ public class ReviewerLeaderboard {
         }
         for (String name : reviewerNames) {
         	User nU = new User(name, "", null);
+        	nU.setRaters(StartCSE360.databaseHelper.getRaters(name));
         	nU.setRatings(StartCSE360.databaseHelper.getRatings(name));
         	users.add(nU);
-        	
         }
         ArrayList<Card> c = new ArrayList<>();
         // System.out.println(users.size());

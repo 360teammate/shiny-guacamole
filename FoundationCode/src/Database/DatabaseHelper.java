@@ -60,6 +60,7 @@ public class DatabaseHelper {
 				+ "password VARCHAR(255), "
 				+ "role VARCHAR(225), "
 				+ "conversations TEXT DEFAULT '', "  // Comma-separated UUIDs
+				+ "raters TEXT NOT NULL, "
 				+ "ratings TEXT NOT NULL)";
 		statement.execute(userTable);
 
@@ -129,17 +130,18 @@ public class DatabaseHelper {
 
 	// Registers a new user in the database.
 	public void register(User user) throws SQLException {
-		String insertUser = "INSERT INTO cse360users (userName, password, role, ratings) VALUES (?, ?, ?, ?)";
+		String insertUser = "INSERT INTO cse360users (userName, password, role, raters, ratings) VALUES (?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getRole().stream()
 					.map(role -> String.valueOf(role.getRoleId())).collect(Collectors.joining(","))
 			);
+			pstmt.setString(4, user.getUserName());
 			String ratingsStr = Arrays.stream(user.getRatings())
                     .mapToObj(String::valueOf)
                     .collect(Collectors.joining(","));
-			pstmt.setString(4, ratingsStr);
+			pstmt.setString(5, ratingsStr);
 
 			pstmt.executeUpdate();
 		}
@@ -670,6 +672,50 @@ public class DatabaseHelper {
 	    return conversationUUIDs;
 	}
 
+	public ArrayList<String> getRaters(String username) {
+		ArrayList<String> ans = new ArrayList<>();
+		String selectSQL = "SELECT raters FROM cse360users WHERE username = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(selectSQL)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+            	String ratersStr = rs.getString("raters");
+                if (ratersStr != null && !ratersStr.isEmpty()) {
+                    ans = new ArrayList<>(Arrays.asList(ratersStr.split(",")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return ans;
+	}
+	
+	public void updateRaters(String username, String rater) {
+		ArrayList<String> ans = getRaters(username);
+		ans.add(rater);
+		String updateSQL = "UPDATE cse360users SET raters = ? WHERE username = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(updateSQL)) {
+
+            // Convert ArrayList to comma-separated string
+            String ratersStr = String.join(",", ans);
+
+            // Set parameters
+            pstmt.setString(1, ratersStr);
+            pstmt.setString(2, username);
+
+            // Execute update
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Raters updated successfully.");
+            } else {
+                System.out.println("No user found with username: " + username);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
+	
 	public int[] getRatings(String username) {
         String selectSQL = "SELECT ratings FROM cse360users WHERE username = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(selectSQL)) {
