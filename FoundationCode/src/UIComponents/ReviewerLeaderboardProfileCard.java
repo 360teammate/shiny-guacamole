@@ -14,7 +14,8 @@ public class ReviewerLeaderboardProfileCard extends Card {
 		Label titleLabel = new Label(user.getUserName() + "\t" + String.format("%.1f", user.getRatingAverage()));
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
-        Text text = new Text("1:\t\n2:\t\n3:\t\n4:\t\n5:\t");
+        int[] ratings = user.getRatings();
+        Text text = new Text(String.format("1:\t%d\n2:\t%d\n3:\t%d\n4:\t%d\n5:\t%d", ratings[0], ratings[1], ratings[2], ratings[3], ratings[4]));
         text.setStyle("-fx-font-size: 15px;");
         
         VBox box = new VBox(5, titleLabel, text);

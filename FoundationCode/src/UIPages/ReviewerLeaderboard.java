@@ -25,9 +25,23 @@ public class ReviewerLeaderboard {
         	new PostsBrowsePage(StartCSE360.questions).show(primaryStage);
         });
 
-        ArrayList<User> users = StartCSE360.databaseHelper.getUsers();
+        // ArrayList<User> users = StartCSE360.databaseHelper.getUsers();
+        ArrayList<String> userNames = StartCSE360.databaseHelper.getAllUsernames();
+        ArrayList<String> reviewerNames = new ArrayList<String>();
+        ArrayList<User> users = new ArrayList<User>();
+        for (String name : userNames) {
+        	if (StartCSE360.databaseHelper.getUserRole(name).contains(UserRole.REVIEWER)) {
+        		reviewerNames.add(name);
+        	}
+        }
+        for (String name : reviewerNames) {
+        	User nU = new User(name, "", null);
+        	nU.setRatings(StartCSE360.databaseHelper.getRatings(name));
+        	users.add(nU);
+        	
+        }
         ArrayList<Card> c = new ArrayList<>();
-        System.out.println(users.size());
+        // System.out.println(users.size());
         for (User u : users) {
         	c.add(new ReviewerLeaderboardProfileCard(u, primaryStage));
         }

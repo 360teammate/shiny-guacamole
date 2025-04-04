@@ -41,7 +41,7 @@ public class DatabaseHelper {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
-//			statement.execute("DROP ALL OBJECTS");
+			// statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -54,7 +54,8 @@ public class DatabaseHelper {
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, "
 				+ "password VARCHAR(255), "
-				+ "role VARCHAR(225))";
+				+ "role VARCHAR(225), "
+				+ "ratings TEXT NOT NULL)";
 		statement.execute(userTable);
 		
 		// Create the invitation codes table
@@ -86,17 +87,7 @@ public class DatabaseHelper {
 	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
 	    statement.execute(createAnswersTable);
 
-	    /*
-	    String createRatingsTable = "CREATE TABLE IF NOT EXISTS ratings ("
-	    		+ "raters TEXT NOT NULL, "
-	    		+ "one INT DEFAULT 0, "
-	    		+ "two INT DEFAULT 0, "
-	    		+ "three INT DEFAULT 0, "
-	    		+ "four INT DEFAULT 0, "
-	    		+ "five INT DEFAULT 0)";
-	    */
-	    /*
-	     * int[] intArray = user.getRatings();
+	     /* int[] intArray = user.getRatings();
 	        String intArrayString = Arrays.stream(intArray)
 	                .mapToObj(String::valueOf)
 	                .collect(Collectors.joining(","));
@@ -118,13 +109,17 @@ public class DatabaseHelper {
 
 	// Registers a new user in the database.
 	public void register(User user) throws SQLException {
-		String insertUser = "INSERT INTO cse360users (userName, password, role) VALUES (?, ?, ?)";
+		String insertUser = "INSERT INTO cse360users (userName, password, role, ratings) VALUES (?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getRole().stream()
 					.map(role -> String.valueOf(role.getRoleId())).collect(Collectors.joining(","))
 			);
+			String ratingsStr = Arrays.stream(user.getRatings())
+                    .mapToObj(String::valueOf)
+                    .collect(Collectors.joining(","));
+			pstmt.setString(4, ratingsStr);
 
 			pstmt.executeUpdate();
 		}
@@ -428,6 +423,71 @@ public class DatabaseHelper {
 	    }
 	}
 
+	public int[] getRatings(String username) {
+        String selectSQL = "SELECT ratings FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(selectSQL)) {
+            
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Convert the comma-separated string into an int array
+                String ratingsStr = rs.getString("ratings");
+                return Arrays.stream(ratingsStr.split(","))
+                             .mapToInt(Integer::parseInt)
+                             .toArray();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new int[0]; // Return an empty array if user not found or error occurs
+    }
+	
+	public void updateUserRatings(String username, int rating) {
+		String selectSQL = "SELECT ratings FROM cse360users WHERE username = ?";
+        String updateSQL = "UPDATE cse360users SET ratings = ? WHERE username = ?";
+
+        try (PreparedStatement selectStmt = connection.prepareStatement(selectSQL)) {
+            
+            selectStmt.setString(1, username);
+            ResultSet rs = selectStmt.executeQuery();
+
+            if (rs.next()) {
+                // Get the comma-separated ratings string
+                String ratingsStr = rs.getString("ratings");
+                String[] ratingArray = ratingsStr.split(",");
+
+                if (rating >= 0 && rating < ratingArray.length) {
+                    // Convert to integer array and increment the selected index
+                    int[] ratings = Arrays.stream(ratingArray)
+                                          .mapToInt(Integer::parseInt)
+                                          .toArray();
+                    ratings[rating]++; // Increment the specific rating
+
+                    // Convert back to a comma-separated string
+                    String updatedRatingsStr = Arrays.stream(ratings)
+                                                     .mapToObj(String::valueOf)
+                                                     .collect(Collectors.joining(","));
+
+                    // Update the database
+                    try (PreparedStatement updateStmt = connection.prepareStatement(updateSQL)) {
+                        updateStmt.setString(1, updatedRatingsStr);
+                        updateStmt.setString(2, username);
+                        updateStmt.executeUpdate();
+                        System.out.println("Updated ratings for " + username + ": " + updatedRatingsStr);
+                    }
+                } else {
+                    System.out.println("Index out of range!");
+                }
+            } else {
+                System.out.println("User not found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	/*
 	public ArrayList<User> getUsers() {
 		ArrayList<User> ans = new ArrayList<>();
 		ArrayList<String> usernames = this.getAllUsernames();
@@ -437,7 +497,7 @@ public class DatabaseHelper {
 				ans.add(new User(str, "", null));
 			}
 		}
-		/*
+
 		String query = "SELECT * FROM cse360users";
 		try (PreparedStatement pstmt = connection.prepareStatement(query);
 		  	ResultSet rs = pstmt.executeQuery()) {
@@ -447,7 +507,8 @@ public class DatabaseHelper {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		*/
+
 		return ans;
 	}
+	*/
 }
