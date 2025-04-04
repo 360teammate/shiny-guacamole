@@ -1,6 +1,7 @@
 package UIPages;
 
 import Application.StartCSE360;
+import Database.DatabaseHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,6 +14,13 @@ import javafx.stage.Stage;
  * This page displays a simple welcome message for the user.
  */
 public class UserHomePage {
+	
+	private final DatabaseHelper databaseHelper;
+
+    public UserHomePage(DatabaseHelper databaseHelper) {
+        this.databaseHelper = databaseHelper;
+    }
+	
     public void show(Stage primaryStage) {
 
         VBox layout = new VBox(20);
@@ -32,6 +40,12 @@ public class UserHomePage {
         
         Button privateMessagesButton = createStyledButton("✉️ Private Messages");
         privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
+        
+        Button reviewerListButton = createStyledButton("View Reviewers");
+        reviewerListButton.setOnAction(e -> new ReviewerListPage(databaseHelper).show(primaryStage));
+        
+        Button roleRequestButton = createStyledButton("Request a Role");
+        roleRequestButton.setOnAction(e -> new RoleRequestPage(databaseHelper).show(primaryStage));
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
@@ -39,7 +53,7 @@ public class UserHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, privateMessagesButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, privateMessagesButton, reviewerListButton, roleRequestButton, quitButton);
 
         Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(userScene);

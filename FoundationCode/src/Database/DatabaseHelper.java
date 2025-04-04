@@ -14,6 +14,7 @@ import Application.Answer;
 import Application.Conversation;
 import Application.Message;
 import Application.Question;
+import Application.RoleRequest;
 import Application.User;
 import Application.UserRole;
 
@@ -94,6 +95,12 @@ public class DatabaseHelper {
 	            + "uuid VARCHAR(36) PRIMARY KEY, "
 	            + "users TEXT NOT NULL)";
 	    statement.execute(createConversationsTable);
+	    String createRoleRequestTable = "CREATE TABLE IF NOT EXISTS RoleRequest ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "author VARCHAR(255) NOT NULL, "
+	            + "requestText TEXT NOT NULL, "
+	            + "requestedRole INT NOT NULL)";
+	    statement.execute(createRoleRequestTable);
 
 	    String createMessagesTable = "CREATE TABLE IF NOT EXISTS messages ("
 	            + "uuid VARCHAR(36) PRIMARY KEY, "
@@ -163,6 +170,8 @@ public class DatabaseHelper {
 	    }
 	    return false; // If an error occurs, assume user doesn't exist
 	}
+	
+	
 	
 	// Retrieves the role of a user from the database using their UserName.
 	public ArrayList<UserRole> getUserRole(String userName) {
@@ -380,6 +389,80 @@ public class DatabaseHelper {
         }
         return answers;
     }
+    
+    public void insertRoleRequest(String author, String requestText, UserRole requestedRole) throws SQLException {
+        String checkQuery = "SELECT COUNT(*) FROM RoleRequest WHERE author = ?";
+        String insertQuery = "INSERT INTO RoleRequest (author, requestText, requestedRole) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
+            checkStatement.setString(1, author);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    // Author already exists, do not insert
+                	throw new SQLException("A role request for this author already exists.");
+                }
+            }
+        }
+
+        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+            insertStatement.setString(1, author);
+            insertStatement.setString(2, requestText);
+            insertStatement.setInt(3, requestedRole.getRoleId());
+            insertStatement.executeUpdate();
+        }
+    }
+    
+    public ArrayList<RoleRequest> getRoleRequests() throws SQLException {
+        String query = "SELECT id, author, requestText, requestedRole FROM RoleRequest";
+        ArrayList<RoleRequest> requests = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String author = resultSet.getString("author");
+                String requestText = resultSet.getString("requestText");
+                int roleId = resultSet.getInt("requestedRole");
+
+                UserRole role = UserRole.fromInt(roleId); // Convert int back to UserRole enum
+                requests.add(new RoleRequest(author, requestText, role));
+            }
+        }
+        return requests;
+    }
+    
+    public ArrayList<User> getPendingRequests() throws SQLException {
+        ArrayList<User> pendingUsers = new ArrayList<>();
+        ArrayList<String> requestAuthors = new ArrayList<>();
+        
+        for (RoleRequest request : getRoleRequests()) {
+        	requestAuthors.add(request.getAuthor());
+        }
+        String query = "SELECT userName, password, role FROM cse360users WHERE userName = ?";
+
+        for (String author : requestAuthors) {
+	        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	            pstmt.setString(1, author );
+	            ResultSet rs = pstmt.executeQuery();
+	
+	            while (rs.next()) {
+	                String userName = rs.getString("userName");
+	                String password = rs.getString("password");
+	                int roleValue = rs.getInt("role");
+	                UserRole role = UserRole.fromInt(roleValue);
+	                ArrayList<UserRole> roles = new ArrayList<>();
+	                roles.add(role);
+	                
+	                pendingUsers.add(new User(userName, password, roles));
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+        }
+
+        return pendingUsers;
+    }
 
 
 	// Closes the database connection and statement.
@@ -497,6 +580,8 @@ public class DatabaseHelper {
 	    ArrayList<UUID> conversationUUIDs = new ArrayList<>();
 	    String query = "SELECT conversations FROM cse360users WHERE userName = ?";
 
+	public User getUser(String userName) {
+	    String query = "SELECT * FROM cse360users WHERE userName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
 	        ResultSet rs = pstmt.executeQuery();
@@ -510,6 +595,15 @@ public class DatabaseHelper {
 	                    }
 	                }
 	            }
+	            String password = rs.getString("password");
+	            String roleString = rs.getString("role");
+	            ArrayList<UserRole> roles = new ArrayList<>();
+
+	            for (String roleId : roleString.split(",")) {
+	                roles.add(UserRole.fromInt(Integer.parseInt(roleId)));
+	            }
+
+	            return new User(userName, password, roles);
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -521,6 +615,23 @@ public class DatabaseHelper {
 
 
 
+
+	    return null; // User not found
+	}
+	
+	public void updateUserRoles(String userName, ArrayList<UserRole> newRoles) throws SQLException {
+	    String updateQuery = "UPDATE cse360users SET role = ? WHERE userName = ?";
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+	        String rolesString = newRoles.stream()
+	                .map(role -> String.valueOf(role.getRoleId())) // Convert each role to its ID
+	                .collect(Collectors.joining(",")); // Join IDs with commas
+	        
+	        pstmt.setString(1, rolesString);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
 
 
 }

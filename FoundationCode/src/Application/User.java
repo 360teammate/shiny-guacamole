@@ -52,8 +52,9 @@ public class User {
 
         
     // Sets the role of the user.
-    public void setRole(ArrayList<UserRole> role) {
-    	this.role=role;
+    public void setRole(ArrayList<UserRole> newRoles) {	
+
+    	this.role=newRoles;
     }
     
     public void newConversation(String name, Conversation conversation) {
