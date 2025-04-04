@@ -1,5 +1,7 @@
 package Application;
 
+import java.sql.SQLException;
+
 public class RoleRequest {
 	private String author;
 	private String requestText;
@@ -11,13 +13,13 @@ public class RoleRequest {
 		this.requestedRole = requestedRole;
 	}
 	
-	public void approveRequest() {
+	public void approveRequest() throws SQLException {
 		StartCSE360.databaseHelper.getUser(author).getRole().add(requestedRole);
-		//TODO: add delete function in databasehelper
+		StartCSE360.databaseHelper.removeRoleRequest(author);
 	}
 	
-	public void rejectRequest() {
-		//TODO: add delete function in databasehelper
+	public void rejectRequest() throws SQLException {
+		StartCSE360.databaseHelper.removeRoleRequest(author);
 	}
 	
 	public String getAuthor() {
@@ -26,6 +28,10 @@ public class RoleRequest {
 	
 	public String getText() {
 		return requestText;
+	}
+	
+	public void editText(String newText) {
+		this.requestText = newText;
 	}
 	
 	public UserRole getRequestedRole() {
