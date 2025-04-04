@@ -11,6 +11,15 @@ public class RoleRequest {
 		this.requestedRole = requestedRole;
 	}
 	
+	public void approveRequest() {
+		StartCSE360.databaseHelper.getUser(author).getRole().add(requestedRole);
+		//TODO: add delete function in databasehelper
+	}
+	
+	public void rejectRequest() {
+		//TODO: add delete function in databasehelper
+	}
+	
 	public String getAuthor() {
 		return author;
 	}
