@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import Database.*;
 import UIPages.AdminHomePage;
+import UIPages.ReviewerHomePage;
 import UIPages.UserHomePage;
 
 /**
@@ -53,6 +54,8 @@ public class WelcomeLoginPage {
 
             if (roles.contains(UserRole.ADMIN)) {
                 new AdminHomePage(databaseHelper).show(primaryStage);
+            } else if(roles.contains(UserRole.REVIEWER)) {
+            	new ReviewerHomePage(databaseHelper).show(primaryStage);
             } else if (roles.contains(UserRole.STUDENT)) {
                 new UserHomePage(databaseHelper).show(primaryStage);
             }
