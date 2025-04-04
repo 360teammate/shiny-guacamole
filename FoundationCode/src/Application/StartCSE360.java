@@ -63,4 +63,11 @@ public class StartCSE360 extends Application {
 // Username: Drew
 // Password: drewDREW111!
 
+// Username: JoshB
+// Password: joshbJOSHB111!
 
+// Username: JoshP
+// Password: joshpJOSHP111!
+
+// Username: Shiv
+// Password: shivSHIV111!

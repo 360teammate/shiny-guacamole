@@ -43,7 +43,7 @@ public class PrivateMessagesPage {
         });
 
         CustomButton backBtn = new CustomButton("← Back", CustomButton.ColorPreset.GREY, e -> {
-            new UserHomePage().show(primaryStage);
+            new UserHomePage(StartCSE360.databaseHelper).show(primaryStage);
         });
         
         Region spacer = new Region();

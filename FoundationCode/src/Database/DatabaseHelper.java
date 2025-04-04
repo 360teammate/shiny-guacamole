@@ -496,6 +496,29 @@ public class DatabaseHelper {
 	    return usernames;
 	}
 	
+	public User getUser(String userName) {
+        String query = "SELECT * FROM cse360users WHERE userName = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String password = rs.getString("password");
+                String roleString = rs.getString("role");
+                ArrayList<UserRole> roles = new ArrayList<>();
+
+                for (String roleId : roleString.split(",")) {
+                    roles.add(UserRole.fromInt(Integer.parseInt(roleId)));
+                }
+
+                return new User(userName, password, roles);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // User not found
+    }
+	
 	public void insertMessage(Message m) throws SQLException {
 	    String insertQuery = "INSERT INTO messages (uuid, content, author, conversation, timestamp) "
 	                       + "VALUES (?, ?, ?, ?, ?)";
@@ -508,6 +531,22 @@ public class DatabaseHelper {
 	        pstmt.executeUpdate();
 	    }
 	}
+	
+	
+	public void updateUserRoles(String userName, ArrayList<UserRole> newRoles) throws SQLException {
+	    String updateQuery = "UPDATE cse360users SET role = ? WHERE userName = ?";
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+	        String rolesString = newRoles.stream()
+	                .map(role -> String.valueOf(role.getRoleId())) // Convert each role to its ID
+	                .collect(Collectors.joining(",")); // Join IDs with commas
+	        
+	        pstmt.setString(1, rolesString);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
+	
 	
 	public void insertConversation(Conversation c) throws SQLException {
 	    String insertQuery = "INSERT INTO conversations (uuid, users) VALUES (?, ?)";
@@ -565,23 +604,21 @@ public class DatabaseHelper {
 	}
 
 	public void updateUserConversations(String userName, ArrayList<UUID> conversations) throws SQLException {
-    String updateQuery = "UPDATE cse360users SET conversations = ? WHERE userName = ?";
-    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
-        String csv = conversations.stream()
-                .map(UUID::toString)
-                .collect(Collectors.joining(","));
-        pstmt.setString(1, csv);
-        pstmt.setString(2, userName);
-        pstmt.executeUpdate();
-    }
-}
+	    String updateQuery = "UPDATE cse360users SET conversations = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+	        String csv = conversations.stream()
+	                .map(UUID::toString)
+	                .collect(Collectors.joining(","));
+	        pstmt.setString(1, csv);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
 
 	public ArrayList<UUID> getUserConversationUUIDs(String userName) {
 	    ArrayList<UUID> conversationUUIDs = new ArrayList<>();
 	    String query = "SELECT conversations FROM cse360users WHERE userName = ?";
 
-	public User getUser(String userName) {
-	    String query = "SELECT * FROM cse360users WHERE userName = ?";
 	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
 	        pstmt.setString(1, userName);
 	        ResultSet rs = pstmt.executeQuery();
@@ -595,42 +632,12 @@ public class DatabaseHelper {
 	                    }
 	                }
 	            }
-	            String password = rs.getString("password");
-	            String roleString = rs.getString("role");
-	            ArrayList<UserRole> roles = new ArrayList<>();
-
-	            for (String roleId : roleString.split(",")) {
-	                roles.add(UserRole.fromInt(Integer.parseInt(roleId)));
-	            }
-
-	            return new User(userName, password, roles);
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
 
 	    return conversationUUIDs;
-	}
-
-
-
-
-
-	    return null; // User not found
-	}
-	
-	public void updateUserRoles(String userName, ArrayList<UserRole> newRoles) throws SQLException {
-	    String updateQuery = "UPDATE cse360users SET role = ? WHERE userName = ?";
-	    
-	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
-	        String rolesString = newRoles.stream()
-	                .map(role -> String.valueOf(role.getRoleId())) // Convert each role to its ID
-	                .collect(Collectors.joining(",")); // Join IDs with commas
-	        
-	        pstmt.setString(1, rolesString);
-	        pstmt.setString(2, userName);
-	        pstmt.executeUpdate();
-	    }
 	}
 
 
