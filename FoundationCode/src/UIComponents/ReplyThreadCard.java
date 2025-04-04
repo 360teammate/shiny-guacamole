@@ -102,37 +102,51 @@ public class ReplyThreadCard extends Card {
                 interactions.getChildren().add(markAsSolution);
             }
             
-            // Show the "Delete Solution" button if the user is a Reviewer and it's an Expert Solution
-            if (!StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
-            	CustomButton deleteSolution = new CustomButton(
-            		    answer.getBodyText().startsWith("Reviewer Solution:") ? "Delete Solution" : "Delete Reply", 
-            		    CustomButton.ColorPreset.GREY, e -> {
-            		        // Remove the answer from the list
-            		        StartCSE360.answers.deleteAnswer(answer.getUUID());
+            // Check if the logged in user is the author of the reply/answer
+            if(StartCSE360.loggedInUser.getUserName().equals(answer.getAuthor())) {
+            	// Show the "Delete Solution" button if the user is a Reviewer and if it's a Reviewer Solution
+            	if (StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
+                	CustomButton deleteSolution = new CustomButton(
+                			// If the reply begins with "Reviewer Solution" The delete button says "Delete Solution", else "Delete Reply"
+                		    answer.getBodyText().startsWith("Reviewer Solution:") ? "Delete Solution" : "Delete Reply", 
+                		    CustomButton.ColorPreset.GREY, e -> {
+                		        // Remove the answer from the list
+                		    	if (answer != null) {
+                		    		StartCSE360.answers.safeDeleteAnswer(answer.getUUID());
 
-            		        // (Might not be needed) If it's a resolved answer for the question, remove it from the question
-            		        if (question.getResolvingChild().equals(answer.getUUID())) {
-            		            question.removeResolvingChild(); // Use the new method to remove the question
-            		        }
+                		            // Make sure the question no longer references the deleted review
+                		            if (question.getResolvingChild() != null && question.getResolvingChild().equals(answer.getUUID())) {
+                		                question.removeResolvingChild();
+                		            }
 
-            		        // Check if the question has no more answers
-            		        if (question.getChildren().isEmpty()) {
-            		            StartCSE360.questions.deleteQuestion(question.getUUID());
-            		        }
+                		            // Instead of deleting the question, just remove the answer from its list of children
+                		            question.getChildren().remove(answer.getUUID());
+                		        }
+                		        reloadReplies.run();
+                		    });
+                		interactions.getChildren().add(deleteSolution);
 
-            		        reloadReplies.run();
-            		    });
-            		interactions.getChildren().add(deleteSolution);
-
+                }
             }
+            
         }
         
         this.getChildren().addAll(authorLabel, bodyLabel, interactions);
 
-        // Recursively add children
-        System.out.printf("Created reply for: '%s', with children '%d'", answer.getBodyText(), answer.getChildren().size());
+        System.out.printf("Created reply for: '%s', with children '%d'%n", answer.getBodyText(), answer.getChildren().size());
+        
+        // Iterate over each child UUID (replies to the current answer)
         for (UUID grandchild : answer.getChildren()) {
-            this.getChildren().add(new ReplyThreadCard(StartCSE360.answers.getAnswer(grandchild), question, reloadReplies));
+            Answer childAnswer = StartCSE360.answers.getAnswer(grandchild);
+            
+            // If the answer couldn't be found (was null), skip it and log it
+            if (childAnswer == null) {
+                System.out.println("Skipping null answer for child UUID: " + grandchild);
+                continue;
+            }
+            
+            // Recursively create a new reply thread card for the child answer and add it to the UI
+            this.getChildren().add(new ReplyThreadCard(childAnswer, question, reloadReplies));
         }
     }
 }

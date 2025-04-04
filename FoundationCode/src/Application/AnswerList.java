@@ -1,5 +1,7 @@
 package Application;
 
+import Application.StartCSE360;
+import Database.DatabaseHelper;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
@@ -87,7 +89,52 @@ public class AnswerList {
      * @param uuid The UUID of the answer to be removed.
      */
     public void deleteAnswer(UUID uuid) {
-        this.answers.remove(uuid);
+        Answer answerToDelete = this.answers.get(uuid);
+
+        if (answerToDelete != null) {
+            try {
+                // Pass UUID to the DatabaseHelper instead of the full Answer object
+                StartCSE360.databaseHelper.deleteAnswer(uuid);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            this.answers.remove(uuid); // Remove from in-memory list
+        }
+    }
+    
+    public void safeDeleteAnswer(UUID answerUUID) {
+        // Remove references from parent answers
+        for (Answer a : this.getAllAnswers().values()) {
+            if (a.getChildren().contains(answerUUID)) {
+                a.getChildren().remove(answerUUID);
+                try {
+                    StartCSE360.databaseHelper.updateAnswer(a);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // Remove references from questions
+        for (Question q : StartCSE360.questions.getAllQuestions().values()) {
+            if (q.getChildren().contains(answerUUID)) {
+                q.getChildren().remove(answerUUID);
+            }
+
+            if (answerUUID.equals(q.getResolvingChild())) {
+                q.removeResolvingChild();
+            }
+
+            try {
+                StartCSE360.databaseHelper.updateQuestion(q);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Now delete the answer normally
+        deleteAnswer(answerUUID);
     }
 
 	public HashMap<UUID, Answer> getAllAnswers() { return this.answers; }
