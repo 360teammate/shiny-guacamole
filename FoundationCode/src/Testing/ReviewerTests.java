@@ -39,7 +39,7 @@ public class ReviewerTests {
         assertEquals("Content should match", content, reviewer.getContent());
     }
 
-    
+    // Test updating the review content
     @Test
     public void testSetContent() {
         String newContent = "Updated review content";
@@ -47,23 +47,25 @@ public class ReviewerTests {
         assertEquals("Content should be updated", newContent, reviewer.getContent());
     }
     
+    // Test setting content to null
     @Test
-    public void testGetReviewId() {
-    	int reviewIdResult = reviewer.getReviewerId();
-    	assertEquals("1", 1, reviewIdResult);
+    public void testNullContentHandling() {
+        reviewer.setContent(null);
+        assertNull("Content should be null", reviewer.getContent());
     }
     
+    // Test setting content to an empty string
     @Test
-    public void testGetQuestionid() {
-    	int questionIdResult = reviewer.getQuestionId();
-    	assertEquals("101", 101, questionIdResult);
+    public void testEmptyContent() {
+        reviewer.setContent("");
+        assertEquals("Content should be empty string", "", reviewer.getContent());
     }
     
+    // Test that answer ID is stored and returned correctly
     @Test
-    public void testGetAnswerId() {
-    	UUID expectedAnswerId = UUID.randomUUID();
-    	reviewer = new Reviewer(UUID.randomUUID(), 1, 101, expectedAnswerId, "Sample review content");
-    	UUID answerIdResult = reviewer.getAnswerId();
-    	assertEquals("Answer ID should match", expectedAnswerId, answerIdResult);
+    public void testAnswerIdConsistency() {
+        UUID newAnswerId = UUID.randomUUID();
+        Reviewer customReviewer = new Reviewer(UUID.randomUUID(), 2, 202, newAnswerId, "Another review");
+        assertEquals("Answer ID should match", newAnswerId, customReviewer.getAnswerId());
     }
 }
