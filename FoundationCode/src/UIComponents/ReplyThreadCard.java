@@ -101,9 +101,32 @@ public class ReplyThreadCard extends Card {
                 });
                 interactions.getChildren().add(markAsSolution);
             }
+            
+            // Show the "Delete Solution" button if the user is a Reviewer and it's an Expert Solution
+            if (!StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
+            	CustomButton deleteSolution = new CustomButton(
+            		    answer.getBodyText().startsWith("Reviewer Solution:") ? "Delete Solution" : "Delete Reply", 
+            		    CustomButton.ColorPreset.GREY, e -> {
+            		        // Remove the answer from the list
+            		        StartCSE360.answers.deleteAnswer(answer.getUUID());
+
+            		        // (Might not be needed) If it's a resolved answer for the question, remove it from the question
+            		        if (question.getResolvingChild().equals(answer.getUUID())) {
+            		            question.removeResolvingChild(); // Use the new method to remove the question
+            		        }
+
+            		        // Check if the question has no more answers
+            		        if (question.getChildren().isEmpty()) {
+            		            StartCSE360.questions.deleteQuestion(question.getUUID());
+            		        }
+
+            		        reloadReplies.run();
+            		    });
+            		interactions.getChildren().add(deleteSolution);
+
+            }
         }
-
-
+        
         this.getChildren().addAll(authorLabel, bodyLabel, interactions);
 
         // Recursively add children

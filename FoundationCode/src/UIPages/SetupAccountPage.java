@@ -6,13 +6,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import Application.PasswordEvaluator;
 import Application.StartCSE360;
 import Application.User;
 import Application.UserNameRecognizer;
 import Application.UserRole;
-import Application.WelcomeLoginPage;
 import Database.*;
 
 /**
@@ -77,7 +78,7 @@ public class SetupAccountPage {
             		if(databaseHelper.validateInvitationCode(code)) {
             			
             			// Create a new user and register them in the database
-		            	User user=new User(userName, password, UserRole.STUDENT);
+		            	User user=new User(userName, password, new ArrayList<UserRole>(List.of(UserRole.STUDENT)));
 		                databaseHelper.register(user);
 		                
 		             // Navigate to the Welcome Login Page

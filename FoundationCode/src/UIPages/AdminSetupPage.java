@@ -6,13 +6,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import Application.PasswordEvaluator;
 import Application.StartCSE360;
 import Application.User;
 import Application.UserNameRecognizer;
 import Application.UserRole;
-import Application.WelcomeLoginPage;
 import Database.*;
 
 /**
@@ -60,7 +61,7 @@ public class AdminSetupPage {
             	}
             	
             	// Create a new User object with admin role and register in the database
-            	User user=new User(userName, password, UserRole.ADMIN);
+            	User user=new User(userName, password, new ArrayList<UserRole>(List.of(UserRole.ADMIN)));
                 databaseHelper.register(user);
                 System.out.println("Administrator setup completed.");
                 
