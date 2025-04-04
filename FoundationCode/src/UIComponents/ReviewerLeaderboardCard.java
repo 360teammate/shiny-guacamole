@@ -1,5 +1,6 @@
 package UIComponents;
 
+import UIComponents.CustomButton.ColorPreset;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
@@ -13,7 +14,7 @@ public class ReviewerLeaderboardCard extends Card {
 		Label titleLabel = new Label("See Reviewer Leaderboard");
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
         */
-        CustomButton button = new CustomButton("See Reviewer Leaderboard");
+        CustomButton button = new CustomButton("See Reviewer Leaderboard", ColorPreset.BLUE);
         button.setOnAction(event -> {
             new UIPages.ReviewerLeaderboard().show(primaryStage);
         });
@@ -21,5 +22,4 @@ public class ReviewerLeaderboardCard extends Card {
         HBox box = new HBox(10, button);
         this.getChildren().addAll(box);
 	}
-	
 }

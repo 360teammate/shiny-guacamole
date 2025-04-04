@@ -26,6 +26,7 @@ public class PostsBrowsePage {
 
         // === Top Cards ===
         contentBox.getChildren().addAll(
+        	new QuitCard(primaryStage),
         	new ReviewerLeaderboardCard(primaryStage),
             new CreateQuestionCard(questionList, primaryStage),
             new FilterCard(questionList, primaryStage)

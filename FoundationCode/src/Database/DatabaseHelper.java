@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -75,7 +76,6 @@ public class DatabaseHelper {
 	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
 	    statement.execute(createQuestionsTable);
 
-
 	    String createAnswersTable = "CREATE TABLE IF NOT EXISTS answers ("
 	            + "uuid VARCHAR(36) PRIMARY KEY, " 
 	            + "body_text TEXT NOT NULL, "
@@ -86,7 +86,22 @@ public class DatabaseHelper {
 	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
 	    statement.execute(createAnswersTable);
 
-
+	    /*
+	    String createRatingsTable = "CREATE TABLE IF NOT EXISTS ratings ("
+	    		+ "raters TEXT NOT NULL, "
+	    		+ "one INT DEFAULT 0, "
+	    		+ "two INT DEFAULT 0, "
+	    		+ "three INT DEFAULT 0, "
+	    		+ "four INT DEFAULT 0, "
+	    		+ "five INT DEFAULT 0)";
+	    */
+	    /*
+	     * int[] intArray = user.getRatings();
+	        String intArrayString = Arrays.stream(intArray)
+	                .mapToObj(String::valueOf)
+	                .collect(Collectors.joining(","));
+	        pstmt.setString(4, intArrayString);
+	     */
 	    
 	}
 
@@ -110,6 +125,7 @@ public class DatabaseHelper {
 			pstmt.setString(3, user.getRole().stream()
 					.map(role -> String.valueOf(role.getRoleId())).collect(Collectors.joining(","))
 			);
+
 			pstmt.executeUpdate();
 		}
 	}
@@ -412,5 +428,26 @@ public class DatabaseHelper {
 	    }
 	}
 
-
+	public ArrayList<User> getUsers() {
+		ArrayList<User> ans = new ArrayList<>();
+		ArrayList<String> usernames = this.getAllUsernames();
+		for (String str : usernames) {
+			ArrayList<UserRole> roles = this.getUserRole(str);
+			if (roles.contains(UserRole.REVIEWER)) {
+				ans.add(new User(str, "", null));
+			}
+		}
+		/*
+		String query = "SELECT * FROM cse360users";
+		try (PreparedStatement pstmt = connection.prepareStatement(query);
+		  	ResultSet rs = pstmt.executeQuery()) {
+		  	while (rs.next()) {
+		      	ans.add((User)rs);
+		   	}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		*/
+		return ans;
+	}
 }

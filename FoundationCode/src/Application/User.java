@@ -38,7 +38,7 @@ public class User {
     		sum += reviewerRatings[i] * (i + 1);
     		totalReviews += reviewerRatings[i];
     	}
-    	return sum / totalReviews;
+    	return (totalReviews == 0) ? 0.0 : (sum / totalReviews);
     }
     
     // Sets the role of the user.
