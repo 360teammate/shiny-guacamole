@@ -7,6 +7,8 @@ import javafx.stage.Stage;
 // import javafx.scene.control.Label;
 
 public class ReviewerLeaderboardCard extends Card {
+	
+	// A card in the posts list page that takes the user to the reviewer leaderboard
 	public ReviewerLeaderboardCard(Stage primaryStage) {
 		super();
 		
