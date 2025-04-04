@@ -9,11 +9,6 @@ import org.junit.Test;
 import Application.Question;
 
 public class PreTP3 {
-
-	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
 	
 	@Test
 	public void questionConstruct() {

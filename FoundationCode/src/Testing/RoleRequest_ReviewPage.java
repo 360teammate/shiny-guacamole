@@ -19,15 +19,6 @@ import UIPages.ReviewerListPage;
 import javafx.stage.Stage;
 
 public class RoleRequest_ReviewPage {
-	
-	@Before
-	public void setUp() {
-	    
-	}
-	@Test
-	public void test() {
-		fail("Not yet implemented");
-	}
 
 	@Test
 	public void roleRequestConstructComplete() {

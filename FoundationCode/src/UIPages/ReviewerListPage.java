@@ -73,15 +73,17 @@ public class ReviewerListPage {
         Label subtitle = new Label("Erm wat da sigma???");
         subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
         
-        // Back button
         Button backButton = createStyledButton("🔙 Back");
         if (StartCSE360.loggedInUser.getRole().contains(UserRole.ADMIN)) {
         	backButton.setOnAction(e -> new AdminHomePage(databaseHelper).show(primaryStage));
         } else if (StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
         	backButton.setOnAction(e -> new ReviewerHomePage(databaseHelper).show(primaryStage));
+        } else if (StartCSE360.loggedInUser.getRole().contains(UserRole.INSTRUCTOR)){
+        	backButton.setOnAction(e -> new InstructorHomePage(databaseHelper).show(primaryStage));
         } else {
         	backButton.setOnAction(e -> new UserHomePage(databaseHelper).show(primaryStage));
         }
+
         VBox userListBox = new VBox(10);
         userListBox.setAlignment(Pos.CENTER);
 

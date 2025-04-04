@@ -74,6 +74,8 @@ public class RequestsPage {
         	backButton.setOnAction(e -> new AdminHomePage(databaseHelper).show(primaryStage));
         } else if (StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
         	backButton.setOnAction(e -> new ReviewerHomePage(databaseHelper).show(primaryStage));
+        } else if (StartCSE360.loggedInUser.getRole().contains(UserRole.INSTRUCTOR)){
+        	backButton.setOnAction(e -> new InstructorHomePage(databaseHelper).show(primaryStage));
         } else {
         	backButton.setOnAction(e -> new UserHomePage(databaseHelper).show(primaryStage));
         }
