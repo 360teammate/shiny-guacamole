@@ -412,6 +412,29 @@ public class DatabaseHelper {
         }
     }
     
+    public void removeRoleRequest(String author) throws SQLException {
+        // Query to check if the author exists in the database
+        String checkQuery = "SELECT COUNT(*) FROM RoleRequest WHERE author = ?";
+        String deleteQuery = "DELETE FROM RoleRequest WHERE author = ?";
+        
+        try (PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
+            checkStatement.setString(1, author);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
+                if (resultSet.next() && resultSet.getInt(1) == 0) {
+                    // No role request found for this author
+                    throw new SQLException("No role request found for this author.");
+                }
+            }
+        }
+
+        // Proceed to delete the role request for the given author
+        try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+            deleteStatement.setString(1, author);
+            deleteStatement.executeUpdate();
+        }
+    }
+
+    
     public ArrayList<RoleRequest> getRoleRequests() throws SQLException {
         String query = "SELECT id, author, requestText, requestedRole FROM RoleRequest";
         ArrayList<RoleRequest> requests = new ArrayList<>();
