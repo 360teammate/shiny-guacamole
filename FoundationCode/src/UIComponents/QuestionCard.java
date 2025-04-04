@@ -3,6 +3,7 @@ package UIComponents;
 import UIPages.PostsBrowsePage;
 import Application.Question;
 import Application.StartCSE360;
+import Application.UserRole;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,9 +26,17 @@ public class QuestionCard extends Card {
                 e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
 
         CustomButton edit = new CustomButton("Edit", CustomButton.ColorPreset.GREY, e -> showEditForm(question, primaryStage));
+        
+        CustomButton createSolution = new CustomButton("Create Solution", CustomButton.ColorPreset.GREY, 
+        	    e -> showSolutionForm(question, primaryStage, reloadReplies));
+        
+        HBox navBar = new HBox(10, back, edit, createSolution);
 
-        HBox navBar = new HBox(10, back, edit);
-
+        // If the logged in user is a Reviewer, the Create Solution button is visible
+        if (!StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
+        	createSolution.setVisible(false);
+        }	
+        
         // TITLE & META
         Label titleLabel = new Label(question.getTitle());
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 22));
@@ -96,4 +105,50 @@ public class QuestionCard extends Card {
         editForm.setPadding(new Insets(10));
         primaryStage.setScene(new Scene(editForm, StartCSE360.WIDTH, StartCSE360.HEIGHT));
     }
+    
+    // UI for Create Solution button
+    private void showSolutionForm(Question question, Stage primaryStage, Runnable reloadReplies) {
+        Stage solutionStage = new Stage();
+        solutionStage.setTitle("Write a Reviewer Solution:");
+
+        TextArea solutionField = new TextArea();
+        solutionField.setPromptText("Enter your solution...");
+        solutionField.setWrapText(true);
+        solutionField.setPrefRowCount(5);
+
+        CustomButton submitButton = new CustomButton("Submit Solution", CustomButton.ColorPreset.BLUE, e -> {
+            String solutionText = solutionField.getText().trim();
+            if (!solutionText.isEmpty()) {
+                try {
+                    // Prefixing solution with "Expert Solution: " to differentiate it in replies
+                    String formattedSolution = "Reviewer Solution: " + solutionText;
+
+                    // Add solution as a normal reply
+                    UUID solutionID = StartCSE360.answers.newAnswer(question, formattedSolution, StartCSE360.loggedInUser.getUserName());
+                    question.addChild(solutionID);
+                    
+                    // Update database
+                    StartCSE360.databaseHelper.updateQuestion(question);
+
+                    // Refresh replies to show the expert solution immediately
+                    reloadReplies.run();
+
+                    // Close the solution input window
+                    solutionStage.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                System.out.println("Validation Error: Solution cannot be empty.");
+            }
+        });
+
+        VBox layout = new VBox(10, new Label("Write your solution:"), solutionField, submitButton);
+        layout.setPadding(new Insets(10));
+
+        Scene scene = new Scene(layout, 400, 300);
+        solutionStage.setScene(scene);
+        solutionStage.show();
+    }
+
 }
