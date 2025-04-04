@@ -167,7 +167,7 @@ public class UserListPage {
         primaryStage.setScene(scene);
     }
 
-    private void assignRole(String targetUserName, ArrayList<UserRole> newRoles, Label errorLabel) {
+    public void assignRole(String targetUserName, ArrayList<UserRole> newRoles, Label errorLabel) {
         if (!databaseHelper.doesUserExist(targetUserName)) {
             errorLabel.setText("Error: User does not exist.");
             return;
