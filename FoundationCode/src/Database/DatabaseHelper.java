@@ -6,12 +6,19 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import Application.Question;
 import Application.Answer;
 import Application.AnswerList;
+import Application.Answer;
+import Application.Conversation;
+import Application.Message;
+import Application.Question;
+import Application.RoleRequest;
 import Application.User;
 import Application.UserRole;
 
@@ -41,7 +48,7 @@ public class DatabaseHelper {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
-//			statement.execute("DROP ALL OBJECTS");
+			//statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -54,8 +61,12 @@ public class DatabaseHelper {
 				+ "id INT AUTO_INCREMENT PRIMARY KEY, "
 				+ "userName VARCHAR(255) UNIQUE, "
 				+ "password VARCHAR(255), "
-				+ "role VARCHAR(225))";
+				+ "role VARCHAR(225), "
+				+ "conversations TEXT DEFAULT '', "  // Comma-separated UUIDs
+				+ "raters TEXT NOT NULL, "		// list of users that have rated this user
+				+ "ratings TEXT NOT NULL)";		// array of 5 values of number of ratings in that category for this reviewer user
 		statement.execute(userTable);
+
 		
 		// Create the invitation codes table
 	    String invitationCodesTable = "CREATE TABLE IF NOT EXISTS InvitationCodes ("
@@ -76,7 +87,6 @@ public class DatabaseHelper {
 	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
 	    statement.execute(createQuestionsTable);
 
-
 	    String createAnswersTable = "CREATE TABLE IF NOT EXISTS answers ("
 	            + "uuid VARCHAR(36) PRIMARY KEY, " 
 	            + "body_text TEXT NOT NULL, "
@@ -86,7 +96,26 @@ public class DatabaseHelper {
 	            + "likes INT DEFAULT 0, "
 	            + "child_uuids TEXT DEFAULT '')"; // Store children UUIDs as comma-separated values
 	    statement.execute(createAnswersTable);
+	    
+	    String createConversationsTable = "CREATE TABLE IF NOT EXISTS conversations ("
+	            + "uuid VARCHAR(36) PRIMARY KEY, "
+	            + "users TEXT NOT NULL)";
+	    statement.execute(createConversationsTable);
+	    String createRoleRequestTable = "CREATE TABLE IF NOT EXISTS RoleRequest ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "author VARCHAR(255) NOT NULL, "
+	            + "requestText TEXT NOT NULL, "
+	            + "requestedRole INT NOT NULL)";
+	    statement.execute(createRoleRequestTable);
 
+	    String createMessagesTable = "CREATE TABLE IF NOT EXISTS messages ("
+	            + "uuid VARCHAR(36) PRIMARY KEY, "
+	            + "content TEXT NOT NULL, "
+	            + "author VARCHAR(255) NOT NULL, "
+	            + "conversation VARCHAR(36) NOT NULL, "
+	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+	            + "FOREIGN KEY (conversation) REFERENCES conversations(uuid))";
+	    statement.execute(createMessagesTable);
 
 	    
 	}
@@ -104,13 +133,19 @@ public class DatabaseHelper {
 
 	// Registers a new user in the database.
 	public void register(User user) throws SQLException {
-		String insertUser = "INSERT INTO cse360users (userName, password, role) VALUES (?, ?, ?)";
+		String insertUser = "INSERT INTO cse360users (userName, password, role, raters, ratings) VALUES (?, ?, ?, ?, ?)";
 		try (PreparedStatement pstmt = connection.prepareStatement(insertUser)) {
 			pstmt.setString(1, user.getUserName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getRole().stream()
 					.map(role -> String.valueOf(role.getRoleId())).collect(Collectors.joining(","))
 			);
+			pstmt.setString(4, user.getUserName());
+			String ratingsStr = Arrays.stream(user.getRatings())
+                    .mapToObj(String::valueOf)
+                    .collect(Collectors.joining(","));
+			pstmt.setString(5, ratingsStr);
+
 			pstmt.executeUpdate();
 		}
 	}
@@ -376,6 +411,103 @@ public class DatabaseHelper {
         }
         return answers;
     }
+    
+    public void insertRoleRequest(String author, String requestText, UserRole requestedRole) throws SQLException {
+        String checkQuery = "SELECT COUNT(*) FROM RoleRequest WHERE author = ?";
+        String insertQuery = "INSERT INTO RoleRequest (author, requestText, requestedRole) VALUES (?, ?, ?)";
+        
+        try (PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
+            checkStatement.setString(1, author);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
+                if (resultSet.next() && resultSet.getInt(1) > 0) {
+                    // Author already exists, do not insert
+                	throw new SQLException("A role request for this author already exists.");
+                }
+            }
+        }
+
+        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+            insertStatement.setString(1, author);
+            insertStatement.setString(2, requestText);
+            insertStatement.setInt(3, requestedRole.getRoleId());
+            insertStatement.executeUpdate();
+        }
+    }
+    
+    public void removeRoleRequest(String author) throws SQLException {
+        // Query to check if the author exists in the database
+        String checkQuery = "SELECT COUNT(*) FROM RoleRequest WHERE author = ?";
+        String deleteQuery = "DELETE FROM RoleRequest WHERE author = ?";
+        
+        try (PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
+            checkStatement.setString(1, author);
+            try (ResultSet resultSet = checkStatement.executeQuery()) {
+                if (resultSet.next() && resultSet.getInt(1) == 0) {
+                    // No role request found for this author
+                    throw new SQLException("No role request found for this author.");
+                }
+            }
+        }
+
+        // Proceed to delete the role request for the given author
+        try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+            deleteStatement.setString(1, author);
+            deleteStatement.executeUpdate();
+        }
+    }
+
+    
+    public ArrayList<RoleRequest> getRoleRequests() throws SQLException {
+        String query = "SELECT id, author, requestText, requestedRole FROM RoleRequest";
+        ArrayList<RoleRequest> requests = new ArrayList<>();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String author = resultSet.getString("author");
+                String requestText = resultSet.getString("requestText");
+                int roleId = resultSet.getInt("requestedRole");
+
+                UserRole role = UserRole.fromInt(roleId); // Convert int back to UserRole enum
+                requests.add(new RoleRequest(author, requestText, role));
+            }
+        }
+        return requests;
+    }
+    
+    public ArrayList<User> getPendingRequests() throws SQLException {
+        ArrayList<User> pendingUsers = new ArrayList<>();
+        ArrayList<String> requestAuthors = new ArrayList<>();
+        
+        for (RoleRequest request : getRoleRequests()) {
+        	requestAuthors.add(request.getAuthor());
+        }
+        String query = "SELECT userName, password, role FROM cse360users WHERE userName = ?";
+
+        for (String author : requestAuthors) {
+	        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	            pstmt.setString(1, author );
+	            ResultSet rs = pstmt.executeQuery();
+	
+	            while (rs.next()) {
+	                String userName = rs.getString("userName");
+	                String password = rs.getString("password");
+	                int roleValue = rs.getInt("role");
+	                UserRole role = UserRole.fromInt(roleValue);
+	                ArrayList<UserRole> roles = new ArrayList<>();
+	                roles.add(role);
+	                
+	                pendingUsers.add(new User(userName, password, roles));
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+        }
+
+        return pendingUsers;
+    }
 
 
 	// Closes the database connection and statement.
@@ -409,6 +541,43 @@ public class DatabaseHelper {
 	    return usernames;
 	}
 	
+	public User getUser(String userName) {
+        String query = "SELECT * FROM cse360users WHERE userName = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setString(1, userName);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String password = rs.getString("password");
+                String roleString = rs.getString("role");
+                ArrayList<UserRole> roles = new ArrayList<>();
+
+                for (String roleId : roleString.split(",")) {
+                    roles.add(UserRole.fromInt(Integer.parseInt(roleId)));
+                }
+
+                return new User(userName, password, roles);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // User not found
+    }
+	
+	public void insertMessage(Message m) throws SQLException {
+	    String insertQuery = "INSERT INTO messages (uuid, content, author, conversation, timestamp) "
+	                       + "VALUES (?, ?, ?, ?, ?)";
+	    try (PreparedStatement pstmt = connection.prepareStatement(insertQuery)) {
+	        pstmt.setString(1, m.getUUID().toString());
+	        pstmt.setString(2, m.getContent());
+	        pstmt.setString(3, m.getAuthor());
+	        pstmt.setString(4, m.getConversation().toString());
+	        pstmt.setTimestamp(5, new Timestamp(m.getTimestamp().getTime()));
+	        pstmt.executeUpdate();
+	    }
+	}
+	
+	
 	public void updateUserRoles(String userName, ArrayList<UserRole> newRoles) throws SQLException {
 	    String updateQuery = "UPDATE cse360users SET role = ? WHERE userName = ?";
 	    
@@ -422,6 +591,194 @@ public class DatabaseHelper {
 	        pstmt.executeUpdate();
 	    }
 	}
+	
+	
+	public void insertConversation(Conversation c) throws SQLException {
+	    String insertQuery = "INSERT INTO conversations (uuid, users) VALUES (?, ?)";
+	    try (PreparedStatement pstmt = connection.prepareStatement(insertQuery)) {
+	        pstmt.setString(1, c.getUUID().toString());
+	        pstmt.setString(2, String.join(",", c.getUsers()));
+	        pstmt.executeUpdate();
+	    }
 
+	    // Optionally insert all messages with this
+	    for (Message m : c.getMessages()) {
+	        insertMessage(m);
+	    }
+	}
+	
+	public HashMap<UUID, Conversation> getConversations() throws SQLException {
+	    HashMap<UUID, Conversation> conversations = new HashMap<>();
+	    String query = "SELECT * FROM conversations";
 
+	    try (PreparedStatement pstmt = connection.prepareStatement(query);
+	         ResultSet rs = pstmt.executeQuery()) {
+	        while (rs.next()) {
+	            UUID uuid = UUID.fromString(rs.getString("uuid"));
+	            ArrayList<String> users = new ArrayList<>(List.of(rs.getString("users").split(",")));
+	            ArrayList<Message> messages = getMessagesByConversation(uuid);
+
+	            conversations.put(uuid, new Conversation(uuid, users, messages));
+	        }
+	    }
+
+	    return conversations;
+	}
+
+	public ArrayList<Message> getMessagesByConversation(UUID conversationId) throws SQLException {
+	    ArrayList<Message> messages = new ArrayList<>();
+	    String query = "SELECT * FROM messages WHERE conversation = ? ORDER BY timestamp ASC";
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, conversationId.toString());
+	        ResultSet rs = pstmt.executeQuery();
+
+	        while (rs.next()) {
+	            Message m = new Message(
+	                UUID.fromString(rs.getString("uuid")),
+	                rs.getString("content"),
+	                rs.getString("author"),
+	                UUID.fromString(rs.getString("conversation")),
+	                rs.getTimestamp("timestamp")
+	            );
+	            messages.add(m);
+	        }
+	    }
+
+	    return messages;
+	}
+
+	public void updateUserConversations(String userName, ArrayList<UUID> conversations) throws SQLException {
+	    String updateQuery = "UPDATE cse360users SET conversations = ? WHERE userName = ?";
+	    try (PreparedStatement pstmt = connection.prepareStatement(updateQuery)) {
+	        String csv = conversations.stream()
+	                .map(UUID::toString)
+	                .collect(Collectors.joining(","));
+	        pstmt.setString(1, csv);
+	        pstmt.setString(2, userName);
+	        pstmt.executeUpdate();
+	    }
+	}
+
+	public ArrayList<UUID> getUserConversationUUIDs(String userName) {
+	    ArrayList<UUID> conversationUUIDs = new ArrayList<>();
+	    String query = "SELECT conversations FROM cse360users WHERE userName = ?";
+
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        pstmt.setString(1, userName);
+	        ResultSet rs = pstmt.executeQuery();
+
+	        if (rs.next()) {
+	            String raw = rs.getString("conversations");
+	            if (raw != null && !raw.isBlank()) {
+	                for (String id : raw.split(",")) {
+	                    if (!id.isBlank()) {
+	                        conversationUUIDs.add(UUID.fromString(id.trim()));
+	                    }
+	                }
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return conversationUUIDs;
+	}
+
+	public ArrayList<String> getRaters(String username) {
+		ArrayList<String> ans = new ArrayList<>();
+		String selectSQL = "SELECT raters FROM cse360users WHERE username = ?";
+		try (PreparedStatement pstmt = connection.prepareStatement(selectSQL)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+            	String ratersStr = rs.getString("raters");
+                if (ratersStr != null && !ratersStr.isEmpty()) {
+                    ans = new ArrayList<>(Arrays.asList(ratersStr.split(",")));
+                }
+            }
+        }
+		catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return ans;
+	}
+	
+	public void updateRaters(String username, String rater) {
+		ArrayList<String> ans = getRaters(username);
+		ans.add(rater);
+		String updateSQL = "UPDATE cse360users SET raters = ? WHERE username = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(updateSQL)) {
+            String ratersStr = String.join(",", ans);
+            pstmt.setString(1, ratersStr);
+            pstmt.setString(2, username);
+
+            pstmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
+	
+	public int[] getRatings(String username) {
+        String selectSQL = "SELECT ratings FROM cse360users WHERE username = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(selectSQL)) {
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // Convert the comma-separated string into an int array
+                String ratingsStr = rs.getString("ratings");
+                return Arrays.stream(ratingsStr.split(","))
+                             .mapToInt(Integer::parseInt)
+                             .toArray();
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new int[0]; // Return an empty array if user not found or error occurs
+    }
+	
+	public void updateUserRatings(String username, int rating) {
+		String selectSQL = "SELECT ratings FROM cse360users WHERE username = ?";
+        String updateSQL = "UPDATE cse360users SET ratings = ? WHERE username = ?";
+
+        try (PreparedStatement selectStmt = connection.prepareStatement(selectSQL)) {
+            selectStmt.setString(1, username);
+            ResultSet rs = selectStmt.executeQuery();
+
+            if (rs.next()) {
+                String ratingsStr = rs.getString("ratings");
+                String[] ratingArray = ratingsStr.split(",");
+
+                if (rating >= 0 && rating < ratingArray.length) {
+                    int[] ratings = Arrays.stream(ratingArray)
+                                          .mapToInt(Integer::parseInt)
+                                          .toArray();
+                    ratings[rating]++;
+                    String updatedRatingsStr = Arrays.stream(ratings)
+                                                     .mapToObj(String::valueOf)
+                                                     .collect(Collectors.joining(","));
+
+                    try (PreparedStatement updateStmt = connection.prepareStatement(updateSQL)) {
+                        updateStmt.setString(1, updatedRatingsStr);
+                        updateStmt.setString(2, username);
+                        updateStmt.executeUpdate();
+                        System.out.println("Updated ratings for " + username + ": " + updatedRatingsStr);
+                    }
+                }
+                else {
+                    System.out.println("Index out of range!");
+                }
+            } 
+            else {
+                System.out.println("User not found.");
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+	}
 }

@@ -1,7 +1,5 @@
 package UIPages;
 
-import Application.StartCSE360;
-import Database.DatabaseHelper;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,54 +8,76 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-/**
- * This page displays a simple welcome message for the user.
- */
-public class UserHomePage {
-	
-	private final DatabaseHelper databaseHelper;
+import java.util.ArrayList;
 
-    public UserHomePage(DatabaseHelper databaseHelper) {
+import Application.StartCSE360;
+import Application.User;
+import Application.UserRole;
+import Database.*;
+import UIPages.AdminHomePage;
+import UIPages.ReviewerHomePage;
+import UIPages.UserHomePage;
+
+/**
+ * The WelcomeLoginPage class displays a welcome screen for authenticated users.
+ * It allows users to navigate to their respective pages based on their role or quit the application.
+ */
+public class WelcomeLoginPage {
+
+    private final DatabaseHelper databaseHelper;
+
+    public WelcomeLoginPage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
-	
-    public void show(Stage primaryStage) {
 
+    public void show(Stage primaryStage, User user) {
+    	try {
+			StartCSE360.loggedInUser = user;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.CENTER);
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
 
         // Title
-        Label title = new Label("User Dashboard");
-        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
+        Label welcomeLabel = new Label("Welcome to the Portal!");
+        welcomeLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
-        Label subtitle = new Label("Browse and manage your posts");
+        Label subtitle = new Label("Navigate to your respective dashboard");
         subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #555;");
 
         // Buttons
-        Button postListButton = createStyledButton("📜 View Posts");
-        postListButton.setOnAction(e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
-        
-        Button privateMessagesButton = createStyledButton("✉️ Private Messages");
-        privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
-        
-        Button reviewerListButton = createStyledButton("View Reviewers");
-        reviewerListButton.setOnAction(e -> new ReviewerListPage(databaseHelper).show(primaryStage));
-        
-        Button roleRequestButton = createStyledButton("Request a Role");
-        roleRequestButton.setOnAction(e -> new RoleRequestPage(databaseHelper).show(primaryStage));
+        Button continueButton = createStyledButton("➡ Continue to Dashboard");
+
+        final ArrayList<UserRole> roles = user.getRole();  
+        continueButton.setOnAction(a -> {
+            System.out.println(roles);
+
+            if (roles.contains(UserRole.ADMIN)) {
+                new AdminHomePage(databaseHelper).show(primaryStage);
+            } else if(roles.contains(UserRole.INSTRUCTOR)) {
+            	new InstructorHomePage(databaseHelper).show(primaryStage);
+            }else if(roles.contains(UserRole.REVIEWER)) {
+            	new ReviewerHomePage(databaseHelper).show(primaryStage);
+            } else if (roles.contains(UserRole.STUDENT)) {
+                new UserHomePage(databaseHelper).show(primaryStage);
+            }
+        });
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
-            StartCSE360.databaseHelper.closeConnection();
-            Platform.exit();
+            databaseHelper.closeConnection();
+            Platform.exit(); // Exit the JavaFX application
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, privateMessagesButton, reviewerListButton, roleRequestButton, quitButton);
+        layout.getChildren().addAll(welcomeLabel, subtitle, continueButton, quitButton);
+        Scene welcomeScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
 
-        Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
-        primaryStage.setScene(userScene);
-        primaryStage.setTitle("User Dashboard");
+        // Set the scene to primary stage
+        primaryStage.setScene(welcomeScene);
+        primaryStage.setTitle("Welcome Page");
     }
 
     /**
@@ -88,6 +108,7 @@ public class UserHomePage {
                          "-fx-background-color: #005a9e; -fx-text-fill: white; " +
                          "-fx-border-radius: 5; -fx-background-radius: 5;";
         }
+
 
         button.setStyle(defaultStyle);
         button.setOnMouseEntered(e -> button.setStyle(hoverStyle));

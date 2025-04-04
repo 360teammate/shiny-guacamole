@@ -53,7 +53,7 @@ public class StartCSE360 extends Application {
 
 // ACCOUNTS:::
 
-// Username: admin
+// Username: Admin
 // Password: adminADMIN111!
 
 // Username: Abram
@@ -65,4 +65,8 @@ public class StartCSE360 extends Application {
 // Username: Drew
 // Password: drewDREW111!
 
+// Username: josh
+// Password: OmegaChungus69_
 
+// Username: Shiv
+// Password: shivSHIV111!

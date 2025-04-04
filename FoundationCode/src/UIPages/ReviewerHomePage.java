@@ -13,11 +13,11 @@ import javafx.stage.Stage;
 /**
  * This page displays a simple welcome message for the user.
  */
-public class UserHomePage {
+public class ReviewerHomePage {
 	
 	private final DatabaseHelper databaseHelper;
 
-    public UserHomePage(DatabaseHelper databaseHelper) {
+    public ReviewerHomePage(DatabaseHelper databaseHelper) {
         this.databaseHelper = databaseHelper;
     }
 	
@@ -28,7 +28,7 @@ public class UserHomePage {
         layout.setStyle("-fx-padding: 30; -fx-background-color: #f4f4f4;");
 
         // Title
-        Label title = new Label("User Dashboard");
+        Label title = new Label("Reviewer Dashboard");
         title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold;");
 
         Label subtitle = new Label("Browse and manage your posts");
@@ -38,22 +38,13 @@ public class UserHomePage {
         Button postListButton = createStyledButton("📜 View Posts");
         postListButton.setOnAction(e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
         
-        Button privateMessagesButton = createStyledButton("✉️ Private Messages");
-        privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
-        
-        Button reviewerListButton = createStyledButton("View Reviewers");
-        reviewerListButton.setOnAction(e -> new ReviewerListPage(databaseHelper).show(primaryStage));
-        
-        Button roleRequestButton = createStyledButton("Request a Role");
-        roleRequestButton.setOnAction(e -> new RoleRequestPage(databaseHelper).show(primaryStage));
-
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
             StartCSE360.databaseHelper.closeConnection();
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, privateMessagesButton, reviewerListButton, roleRequestButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, quitButton);
 
         Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(userScene);
