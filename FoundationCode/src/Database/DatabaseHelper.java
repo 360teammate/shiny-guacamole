@@ -59,7 +59,7 @@ public class DatabaseHelper {
 				+ "userName VARCHAR(255) UNIQUE, "
 				+ "password VARCHAR(255), "
 				+ "role VARCHAR(225), "
-				+ "conversations TEXT DEFAULT '')";  // Comma-separated UUIDs
+				+ "conversations TEXT DEFAULT '', "  // Comma-separated UUIDs
 				+ "ratings TEXT NOT NULL)";
 		statement.execute(userTable);
 

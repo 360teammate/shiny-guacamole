@@ -11,7 +11,7 @@ public class ReviewerLeaderboardProfileCard extends Card {
 	public ReviewerLeaderboardProfileCard(User user, Stage primaryStage) {
 		super();
 		
-		Label titleLabel = new Label(user.getUserName() + "\t" + String.format("%.1f", user.getRatingAverage()));
+		Label titleLabel = new Label(user.getUserName() + " \t" + String.format("%.1f", user.getRatingAverage()));
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         int[] ratings = user.getRatings();
