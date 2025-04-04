@@ -169,4 +169,9 @@ public class Question {
 	public boolean getResolved() { return this.resolved; }
 	public UUID getResolvingChild() { return this.resolvingChildID; }
 	
+	public void removeResolvingChild() {
+	    this.resolvingChildID = null; // Set resolving child to null
+	    this.resolved = false; // Mark the question as unresolved
+	}
+	
 }
