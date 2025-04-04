@@ -20,7 +20,8 @@ public class QuestionList {
      */
     public QuestionList(HashMap<UUID, Question> questions) {
         this.questions = questions;
-        this.questionsSubset = new HashMap<>(); // Initialize an empty subset of questions
+        // this.questionsSubset = new HashMap<>(); // Initialize an empty subset of questions
+        this.questionsSubset = null;
     }
 
     /**
