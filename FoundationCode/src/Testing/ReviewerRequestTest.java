@@ -1,6 +1,7 @@
 package Testing;
 
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -12,6 +13,13 @@ import Application.UserRole;
 import Application.StartCSE360;
 
 public class ReviewerRequestTest {
+
+    @Before
+    public void setup() throws SQLException {
+        if (StartCSE360.databaseHelper != null) {
+            StartCSE360.databaseHelper.connectToDatabase();
+        }
+    }
 
     @Test
     public void testApproveReviewerRole() {
@@ -58,6 +66,9 @@ public class ReviewerRequestTest {
     @Test
     public void testMultipleRoleRequestsInserted() {
         try {
+            StartCSE360.databaseHelper.removeRoleRequest("alice");
+            StartCSE360.databaseHelper.removeRoleRequest("bob");
+
             StartCSE360.databaseHelper.insertRoleRequest("alice", "I want to review", UserRole.REVIEWER);
             StartCSE360.databaseHelper.insertRoleRequest("bob", "Me too!", UserRole.REVIEWER);
 
@@ -70,6 +81,7 @@ public class ReviewerRequestTest {
             fail("SQLException occurred: " + e.getMessage());
         }
     }
+
 
     @Test
     public void testEditRoleRequestText() {
