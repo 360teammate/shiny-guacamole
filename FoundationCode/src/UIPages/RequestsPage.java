@@ -21,6 +21,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 
+/**
+ * A requests page for admin and instructor roles that 
+ * users currently requesting for a new role
+ * 
+ * TODO: Implement approval/rejection with this page
+ */
 public class RequestsPage {
     private final DatabaseHelper databaseHelper;
     private ArrayList<RoleRequest> requests = new ArrayList<>();

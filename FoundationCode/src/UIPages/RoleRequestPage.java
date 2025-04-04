@@ -17,6 +17,10 @@ import Application.User;
 import Application.UserRole;
 import Database.DatabaseHelper;
 
+/*
+ * A page that provides a request form
+ * text field for "resume" and buttons to send request for various roles.
+ */
 public class RoleRequestPage {
 	
 	private final DatabaseHelper databaseHelper;
@@ -26,8 +30,7 @@ public class RoleRequestPage {
 	}
 	
 	public void show(Stage primaryStage) {
-		// Input field for the user's userName, password
-
+		//Text field for the "resume"
         TextField requestField = new TextField();
         requestField.setPromptText("Input application reasoning");
         
