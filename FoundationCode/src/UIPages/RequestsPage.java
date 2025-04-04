@@ -64,7 +64,13 @@ public class RequestsPage {
         
         // Back button
         Button backButton = createStyledButton("🔙 Back");
-        backButton.setOnAction(e -> new UserHomePage(databaseHelper).show(primaryStage));
+        if (StartCSE360.loggedInUser.getRole().contains(UserRole.ADMIN)) {
+        	backButton.setOnAction(e -> new AdminHomePage(databaseHelper).show(primaryStage));
+        } else if (StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
+        	backButton.setOnAction(e -> new ReviewerHomePage(databaseHelper).show(primaryStage));
+        } else {
+        	backButton.setOnAction(e -> new UserHomePage(databaseHelper).show(primaryStage));
+        }
 
         VBox userListBox = new VBox(10);
         userListBox.setAlignment(Pos.CENTER);
@@ -81,8 +87,10 @@ public class RequestsPage {
             // Error label for validation messages
             Label errorLabel = new Label();
             errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
+            
+            
 
-            VBox userBox = new VBox(5, userLabel, requestText, errorLabel);
+            VBox userBox = new VBox(5, userLabel, requestText, backButton, errorLabel);
             
             userBox.setPadding(new Insets(10));
             userBox.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1; -fx-background-color: #ffffff; -fx-border-radius: 5;");
