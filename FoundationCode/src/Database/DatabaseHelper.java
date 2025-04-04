@@ -1,5 +1,6 @@
 package Database;
 import java.sql.*;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,9 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import Application.Answer;
 import Application.Question;
+import Application.Answer;
+import Application.AnswerList;
 import Application.User;
 import Application.UserRole;
 
@@ -298,6 +299,16 @@ public class DatabaseHelper {
             pstmt.setString(6, String.join(",", convertUUIDToString(answer.getChildren()))); // Convert list to CSV format
             pstmt.setString(7, answer.getUUID().toString());
 
+            pstmt.executeUpdate();
+        }
+    }
+    
+    // Deletes an answer from the database based on its UUID
+    public void deleteAnswer(UUID answerUUID) throws SQLException {
+        String deleteQuery = "DELETE FROM answers WHERE uuid = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+            pstmt.setString(1, answerUUID.toString());
             pstmt.executeUpdate();
         }
     }
