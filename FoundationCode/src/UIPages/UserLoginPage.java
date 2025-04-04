@@ -7,11 +7,11 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import Application.StartCSE360;
 import Application.User;
 import Application.UserRole;
-import Application.WelcomeLoginPage;
 import Database.*;
 
 /**
@@ -47,7 +47,7 @@ public class UserLoginPage {
             String userName = userNameField.getText();
             String password = passwordField.getText();
             try {
-            	User user=new User(userName, password, UserRole.NEW_USER);
+            	User user = new User(userName, password, new ArrayList<UserRole>(List.of(UserRole.NEW_USER)));
             	WelcomeLoginPage welcomeLoginPage = new WelcomeLoginPage(databaseHelper);
             	
             	// Retrieve the user's role from the database using userName
