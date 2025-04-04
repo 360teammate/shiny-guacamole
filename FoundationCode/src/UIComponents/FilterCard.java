@@ -38,9 +38,9 @@ public class FilterCard extends Card {
             String author = searchUserField.getText();
             Boolean state = null;
             String selection = resolvedFilterComboBox.getValue();
-            if ("Resolved".equals(selection)) state = true;
-            else if ("Unresolved".equals(selection)) state = false;
-
+            if ("Resolved".equals(selection)) { state = true; }
+            else if ("Unresolved".equals(selection)) { state = false; }
+            
             questionList.searchAll(term, author, state);
             new UIPages.PostsBrowsePage(questionList).show(primaryStage);
         });
