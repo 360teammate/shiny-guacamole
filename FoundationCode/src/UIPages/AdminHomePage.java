@@ -52,8 +52,8 @@ public class AdminHomePage {
         Button privateMessagesButton = createStyledButton("✉️ Private Messages");
         privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
 
-        Button roleRequestButton = createStyledButton("Manage Role Requests");
-        roleRequestButton.setOnAction(e -> new RequestsPage(StartCSE360.databaseHelper).show(primaryStage));
+        Button reviewReqsButton = createStyledButton("🔍 Review Role Requests");
+        reviewReqsButton.setOnAction(e -> new ReviewRequestPage().show(primaryStage));
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
@@ -61,7 +61,7 @@ public class AdminHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, roleRequestButton, privateMessagesButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, reviewReqsButton, privateMessagesButton, quitButton);
 
         Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(adminScene);
