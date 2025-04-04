@@ -15,7 +15,7 @@ public class Conversation {
 	}
 	
 	public Conversation(UUID uuid, ArrayList<String> users, ArrayList<Message> messages) {
-		this.uuid = UUID.randomUUID();
+		this.uuid = uuid;
 		this.users = users;
 		this.messages = messages;
 	}

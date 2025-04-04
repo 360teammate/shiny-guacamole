@@ -40,6 +40,9 @@ public class AdminHomePage {
 
         Button inviteButton = createStyledButton("✉ Send Invite");
         inviteButton.setOnAction(e -> new InvitationPage().show(StartCSE360.databaseHelper, primaryStage));
+        
+        Button privateMessagesButton = createStyledButton("✉️ Private Messages");
+        privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
@@ -47,7 +50,7 @@ public class AdminHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, privateMessagesButton, quitButton);
 
         Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(adminScene);

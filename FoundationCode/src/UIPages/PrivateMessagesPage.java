@@ -120,11 +120,18 @@ public class PrivateMessagesPage {
         CustomButton sendBtn = new CustomButton("Send", CustomButton.ColorPreset.BLUE, e -> {
             String content = replyField.getText().trim();
             if (!content.isEmpty()) {
-                Message newMessage = new Message(content, currentUser.getUserName(), convo.getUUID());
-                convo.getMessages().add(newMessage);
-                // TODO: Save to database
-                replyField.clear();
-                showConversation(convo); // Refresh
+            	Message newMessage = new Message(content, currentUser.getUserName(), convo.getUUID());
+            	convo.getMessages().add(newMessage);
+
+            	try {
+            	    StartCSE360.databaseHelper.insertMessage(newMessage);
+            	} catch (Exception ex) {
+            	    ex.printStackTrace();
+            	}
+
+            	replyField.clear();
+            	showConversation(convo); // Refresh
+
             }
         });
 
@@ -166,7 +173,6 @@ public class PrivateMessagesPage {
         });
 
         CustomButton startBtn = new CustomButton("Start Conversation", CustomButton.ColorPreset.BLUE, e -> {
-            String selected = resultsList.getSelectionModel().getSelectedItem();
             List<String> selectedUsers = resultsList.getSelectionModel().getSelectedItems();
             if (selectedUsers != null && !selectedUsers.isEmpty()) {
                 Set<String> participants = new HashSet<>(selectedUsers);
@@ -178,6 +184,22 @@ public class PrivateMessagesPage {
 
                 if (!conversationMap.containsKey(key)) {
                     Conversation newConvo = new Conversation(new ArrayList<>(participants));
+
+                    try {
+                        StartCSE360.databaseHelper.insertConversation(newConvo);
+
+                        // Update all users' conversation list in DB
+                        for (String user : participants) {
+                            ArrayList<UUID> existingConvos = StartCSE360.databaseHelper.getUserConversationUUIDs(user);
+                            if (!existingConvos.contains(newConvo.getUUID())) {
+                                existingConvos.add(newConvo.getUUID());
+                                StartCSE360.databaseHelper.updateUserConversations(user, existingConvos);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
                     currentUser.newConversation(key, newConvo);
                     conversationMap.put(key, newConvo);
                     conversationListView.getItems().add(key);
