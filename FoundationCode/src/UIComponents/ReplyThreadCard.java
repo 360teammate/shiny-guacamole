@@ -83,10 +83,10 @@ public class ReplyThreadCard extends Card {
             interactions.getChildren().add(checkmark);
         } else {
             String currentUser = StartCSE360.loggedInUser.getUserName();
+            
             boolean isAuthor = currentUser.equals(question.getAuthor());
-
             boolean hasPermission = StartCSE360.loggedInUser.getRole().stream().anyMatch(role ->
-                role == UserRole.ADMIN || role == UserRole.REVIEWER || role == UserRole.INSTRUCTOR
+                role == UserRole.ADMIN || role == UserRole.REVIEWER || role == UserRole.INSTRUCTOR || role == UserRole.STAFF
             );
 
             if (isAuthor || hasPermission) {
@@ -99,34 +99,27 @@ public class ReplyThreadCard extends Card {
                     }
                     reloadReplies.run();
                 });
-                interactions.getChildren().add(markAsSolution);
-            }
-            
-            // Check if the logged in user is the author of the reply/answer
-            if(StartCSE360.loggedInUser.getUserName().equals(answer.getAuthor())) {
-            	// Show the "Delete Solution" button if the user is a Reviewer and if it's a Reviewer Solution
-            	if (StartCSE360.loggedInUser.getRole().contains(UserRole.REVIEWER)) {
-                	CustomButton deleteSolution = new CustomButton(
-                			// If the reply begins with "Reviewer Solution" The delete button says "Delete Solution", else "Delete Reply"
-                		    answer.getBodyText().startsWith("Reviewer Solution:") ? "Delete Solution" : "Delete Reply", 
-                		    CustomButton.ColorPreset.GREY, e -> {
-                		        // Remove the answer from the list
-                		    	if (answer != null) {
-                		    		StartCSE360.answers.safeDeleteAnswer(answer.getUUID());
+ 
+            	CustomButton deleteSolution = new CustomButton(
+        			// If the reply begins with "Reviewer Solution" The delete button says "Delete Solution", else "Delete Reply"
+        		    answer.getBodyText().startsWith("Reviewer Solution:") ? "Delete Solution" : "Delete Reply", 
+        		    CustomButton.ColorPreset.GREY, e -> {
+        		        // Remove the answer from the list
+        		    	if (answer != null) {
+        		    		StartCSE360.answers.safeDeleteAnswer(answer.getUUID());
 
-                		            // Make sure the question no longer references the deleted review
-                		            if (question.getResolvingChild() != null && question.getResolvingChild().equals(answer.getUUID())) {
-                		                question.removeResolvingChild();
-                		            }
+        		            // Make sure the question no longer references the deleted review
+        		            if (question.getResolvingChild() != null && question.getResolvingChild().equals(answer.getUUID())) {
+        		                question.removeResolvingChild();
+        		            }
 
-                		            // Instead of deleting the question, just remove the answer from its list of children
-                		            question.getChildren().remove(answer.getUUID());
-                		        }
-                		        reloadReplies.run();
-                		    });
-                		interactions.getChildren().add(deleteSolution);
+        		            // Instead of deleting the question, just remove the answer from its list of children
+        		            question.getChildren().remove(answer.getUUID());
+        		        }
+        		        reloadReplies.run();
+        		    });
+                interactions.getChildren().addAll(markAsSolution, deleteSolution);
 
-                }
             }
             
         }

@@ -48,7 +48,7 @@ public class DatabaseHelper {
 			connection = DriverManager.getConnection(DB_URL, USER, PASS);
 			statement = connection.createStatement();
 			// You can use this command to clear the database and restart from fresh.
-			//statement.execute("DROP ALL OBJECTS");
+//			statement.execute("DROP ALL OBJECTS");
 
 			createTables();  // Create the necessary tables if they don't exist
 		} catch (ClassNotFoundException e) {
@@ -116,6 +116,12 @@ public class DatabaseHelper {
 	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
 	            + "FOREIGN KEY (conversation) REFERENCES conversations(uuid))";
 	    statement.execute(createMessagesTable);
+	    
+	    String createAnnouncementsTable = "CREATE TABLE IF NOT EXISTS announcements ("
+	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "content TEXT NOT NULL, "
+	            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+	    statement.execute(createAnnouncementsTable);
 
 	    
 	}
@@ -781,4 +787,28 @@ public class DatabaseHelper {
             e.printStackTrace();
         }
 	}
+	
+	public void setLatestAnnouncement(String content) {
+	    String insert = "INSERT INTO announcements (content) VALUES (?)";
+	    try (PreparedStatement pstmt = connection.prepareStatement(insert)) {
+	        pstmt.setString(1, content);
+	        pstmt.executeUpdate();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	public String getLatestAnnouncement() {
+	    String query = "SELECT content FROM announcements ORDER BY created_at DESC LIMIT 1";
+	    try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+	        ResultSet rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getString("content");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
 }

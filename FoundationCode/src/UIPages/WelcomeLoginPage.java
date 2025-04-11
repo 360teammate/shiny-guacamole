@@ -59,7 +59,9 @@ public class WelcomeLoginPage {
                 new AdminHomePage(databaseHelper).show(primaryStage);
             } else if(roles.contains(UserRole.INSTRUCTOR)) {
             	new InstructorHomePage(databaseHelper).show(primaryStage);
-            }else if(roles.contains(UserRole.REVIEWER)) {
+            } else if(roles.contains(UserRole.STAFF)) {
+            	new StaffHomePage(databaseHelper).show(primaryStage);
+            } else if(roles.contains(UserRole.REVIEWER)) {
             	new ReviewerHomePage(databaseHelper).show(primaryStage);
             } else if (roles.contains(UserRole.STUDENT)) {
                 new UserHomePage(databaseHelper).show(primaryStage);

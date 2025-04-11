@@ -26,11 +26,12 @@ public class PostsBrowsePage {
 
         // === Top Cards ===
         contentBox.getChildren().addAll(
-        	new QuitCard(primaryStage),
-        	new ReviewerLeaderboardCard(primaryStage),
-            new CreateQuestionCard(questionList, primaryStage),
-            new FilterCard(questionList, primaryStage)
-        );
+        	    new NavigationCard(primaryStage),
+        	    new AnnouncementCard(),
+        	    new ReviewerLeaderboardCard(primaryStage),
+        	    new CreateQuestionCard(questionList, primaryStage),
+        	    new FilterCard(questionList, primaryStage)
+        	);
 
         // === Posts List Card ===
         Card postListCard = new Card();

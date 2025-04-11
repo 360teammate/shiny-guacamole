@@ -45,7 +45,7 @@ public class InstructorHomePage {
         privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
 
         Button roleRequestButton = createStyledButton("Manage Role Requests");
-        roleRequestButton.setOnAction(e -> new RequestsPage(StartCSE360.databaseHelper).show(primaryStage));
+        roleRequestButton.setOnAction(e -> new ReviewRequestPage().show(primaryStage));
 
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {

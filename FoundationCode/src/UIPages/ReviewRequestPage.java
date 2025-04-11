@@ -30,54 +30,60 @@ public class ReviewRequestPage {
         requestList.setPadding(new Insets(10));
 
         try {
-            ArrayList<User> pendingUsers = StartCSE360.databaseHelper.getPendingRequests();
+            ArrayList<RoleRequest> pendingRequests = StartCSE360.databaseHelper.getRoleRequests();
 
-            if (pendingUsers.isEmpty()) {
+            if (pendingRequests.isEmpty()) {
                 requestList.getChildren().add(new Label("No pending requests."));
             } else {
-                for (User user : pendingUsers) {
-                    HBox row = new HBox(10);
-                    row.setAlignment(Pos.CENTER_LEFT);
+            	for (RoleRequest request : pendingRequests) {
+            	    HBox row = new HBox(10);
+            	    row.setAlignment(Pos.CENTER_LEFT);
+            	    row.setPadding(new Insets(10));
+            	    row.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #ccc; -fx-border-radius: 5; -fx-background-radius: 5;");
 
-                    Label userLabel = new Label(user.getUserName());
-                    userLabel.setStyle("-fx-font-size: 16px;");
+            	    // User info VBox (username + request text)
+            	    VBox userInfo = new VBox(5);
+            	    Label userLabel = new Label(request.getAuthor());
+            	    userLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-                    CustomButton approveBtn = new CustomButton("Approve", CustomButton.ColorPreset.GREEN, e -> {
-                        try {
-                            ArrayList<UserRole> roles = user.getRole();
-                            if (!roles.contains(UserRole.REVIEWER)) {
-                                roles.add(UserRole.REVIEWER);
-                                StartCSE360.databaseHelper.updateUserRoles(user.getUserName(), roles);
+            	    Label requestText = new Label(request.getText());
+            	    requestText.setWrapText(true);
+            	    requestText.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
 
-                                // Remove the request after approval
-                                StartCSE360.databaseHelper.removeRoleRequest(user.getUserName());
+            	    userInfo.getChildren().addAll(userLabel, requestText);
 
-                                show(primaryStage); // reload the page
-                            }
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    });
+            	    CustomButton approveBtn = new CustomButton("Approve", CustomButton.ColorPreset.GREEN, e -> {
+            	        try {
+            	            ArrayList<UserRole> roles = StartCSE360.databaseHelper.getUserRole(request.getAuthor());
+            	            if (!roles.contains(UserRole.REVIEWER)) {
+            	                roles.add(UserRole.REVIEWER);
+            	                StartCSE360.databaseHelper.updateUserRoles(request.getAuthor(), roles);
+            	                StartCSE360.databaseHelper.removeRoleRequest(request.getAuthor());
+            	                show(primaryStage); // reload page
+            	            }
+            	        } catch (SQLException ex) {
+            	            ex.printStackTrace();
+            	        }
+            	    });
 
+            	    CustomButton denyBtn = new CustomButton("Deny", CustomButton.ColorPreset.RED, e -> {
+            	        try {
+            	            StartCSE360.databaseHelper.removeRoleRequest(request.getAuthor());
+            	            requestList.getChildren().remove(row);
+            	            System.out.println("Denied request for: " + request.getAuthor());
+            	        } catch (SQLException ex) {
+            	            ex.printStackTrace();
+            	            System.out.println("Failed to deny request for: " + request.getAuthor());
+            	        }
+            	    });
 
-                    CustomButton denyBtn = new CustomButton("Deny", CustomButton.ColorPreset.RED, e -> {
-                        try {
-                            StartCSE360.databaseHelper.removeRoleRequest(user.getUserName());
-                            requestList.getChildren().remove(row); // visually remove after DB update
-                            System.out.println("Denied request for: " + user.getUserName());
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                            System.out.println("Failed to deny request for: " + user.getUserName());
-                        }
-                    });
+            	    Region spacer = new Region();
+            	    HBox.setHgrow(spacer, Priority.ALWAYS);
 
+            	    row.getChildren().addAll(userInfo, spacer, approveBtn, denyBtn);
+            	    requestList.getChildren().add(row);
+            	}
 
-                    Region spacer = new Region();
-                    HBox.setHgrow(spacer, Priority.ALWAYS);
-
-                    row.getChildren().addAll(userLabel, spacer, approveBtn, denyBtn);
-                    requestList.getChildren().add(row);
-                }
             }
         } catch (SQLException e) {
             requestList.getChildren().add(new Label("Error fetching pending requests."));
