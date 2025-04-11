@@ -1,7 +1,6 @@
 package UIPages;
 
 import Application.*;
-import Database.DatabaseHelper;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
