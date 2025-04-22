@@ -4,6 +4,7 @@ module FoundationCode {
     requires javafx.graphics;
     requires static junit;
 
+
     opens Application to javafx.graphics, javafx.fxml;
     opens Testing;
 }

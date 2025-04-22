@@ -38,13 +38,17 @@ public class ReviewerHomePage {
         Button postListButton = createStyledButton("📜 View Posts");
         postListButton.setOnAction(e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
         
+     // View staff announcements
+        Button announcementsButton = createStyledButton("📢 Announcements");
+        announcementsButton.setOnAction(e -> new StaffAnnouncementPage().show(primaryStage));
+        
         Button quitButton = createStyledButton("❌ Quit", true);
         quitButton.setOnAction(a -> {
             StartCSE360.databaseHelper.closeConnection();
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, announcementsButton, quitButton);
 
         Scene userScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(userScene);

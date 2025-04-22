@@ -45,6 +45,9 @@ public class AdminHomePage {
 
         Button userListButton = createStyledButton("👥 User List");
         userListButton.setOnAction(e -> new UserListPage(databaseHelper).show(primaryStage));
+        
+        Button announcementButton = createStyledButton("📢 Post Announcement");
+        announcementButton.setOnAction(e -> new StaffAnnouncementPage().show(primaryStage));
 
         Button inviteButton = createStyledButton("✉ Send Invite");
         inviteButton.setOnAction(e -> new InvitationPage().show(StartCSE360.databaseHelper, primaryStage));
@@ -61,7 +64,7 @@ public class AdminHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, inviteButton, reviewReqsButton, privateMessagesButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, userListButton, announcementButton, inviteButton, reviewReqsButton, privateMessagesButton, quitButton);
 
         Scene adminScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(adminScene);

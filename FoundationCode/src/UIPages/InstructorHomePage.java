@@ -37,9 +37,9 @@ public class InstructorHomePage {
         Button postListButton = createStyledButton("📜 View Posts");
         postListButton.setOnAction(e -> new PostsBrowsePage(StartCSE360.questions).show(primaryStage));
 
-        //TODO: Unsure if Instructor should have userlist. Uncomment if they should
-        //Button userListButton = createStyledButton("👥 User List");
-        //userListButton.setOnAction(e -> new UserListPage(databaseHelper).show(primaryStage));
+        // Post announcements
+        Button announcementsButton = createStyledButton("📢 Post Announcement");
+        announcementsButton.setOnAction(e -> new StaffAnnouncementPage().show(primaryStage));
 
         Button privateMessagesButton = createStyledButton("✉️ Private Messages");
         privateMessagesButton.setOnAction(e -> new PrivateMessagesPage().show(primaryStage));
@@ -53,7 +53,7 @@ public class InstructorHomePage {
             Platform.exit();
         });
 
-        layout.getChildren().addAll(title, subtitle, postListButton, roleRequestButton, privateMessagesButton, quitButton);
+        layout.getChildren().addAll(title, subtitle, postListButton, announcementsButton, roleRequestButton, privateMessagesButton, quitButton);
 
         Scene instructorScene = new Scene(layout, StartCSE360.WIDTH, StartCSE360.HEIGHT);
         primaryStage.setScene(instructorScene);

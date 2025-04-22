@@ -21,6 +21,7 @@ import Application.Question;
 import Application.RoleRequest;
 import Application.User;
 import Application.UserRole;
+import Application.Announcement;
 
 
 /**
@@ -119,11 +120,19 @@ public class DatabaseHelper {
 	    
 	    String createAnnouncementsTable = "CREATE TABLE IF NOT EXISTS announcements ("
 	            + "id INT AUTO_INCREMENT PRIMARY KEY, "
+	            + "author VARCHAR(255) NOT NULL, "
 	            + "content TEXT NOT NULL, "
-	            + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+	            + "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 	    statement.execute(createAnnouncementsTable);
 
-	    
+	 // Add missing columns (safe migration)
+	    try {
+	        statement.execute("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS author VARCHAR(255)");
+	        statement.execute("ALTER TABLE announcements ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+	        System.out.println("✅ Checked and added missing columns to 'announcements' table.");
+	    } catch (SQLException e) {
+	        System.err.println("⚠️ Failed to update announcements table schema: " + e.getMessage());
+	    }
 	}
 
 
@@ -788,7 +797,7 @@ public class DatabaseHelper {
         }
 	}
 	
-	public void setLatestAnnouncement(String content) {
+	/*public void setLatestAnnouncement(String content) {
 	    String insert = "INSERT INTO announcements (content) VALUES (?)";
 	    try (PreparedStatement pstmt = connection.prepareStatement(insert)) {
 	        pstmt.setString(1, content);
@@ -809,6 +818,44 @@ public class DatabaseHelper {
 	        e.printStackTrace();
 	    }
 	    return null;
-	}
+	}*/
+	
+	public void insertAnnouncement(String author, String content) throws SQLException {
+        String insertQuery = "INSERT INTO announcements (author, content) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(insertQuery)) {
+            pstmt.setString(1, author);
+            pstmt.setString(2, content);
+            pstmt.executeUpdate();
+        }
+    }
+
+	public ArrayList<Announcement> getAllAnnouncements() throws SQLException {
+        ArrayList<Announcement> announcements = new ArrayList<>();
+        String query = "SELECT * FROM announcements ORDER BY timestamp DESC";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(query);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String author = rs.getString("author");
+                String content = rs.getString("content");
+                Timestamp timestamp = rs.getTimestamp("timestamp");
+
+                announcements.add(new Announcement(id, author, content, timestamp));
+            }
+        }
+
+        return announcements;
+    }
+	
+	public void deleteAnnouncement(int id) throws SQLException {
+        String deleteQuery = "DELETE FROM announcements WHERE id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(deleteQuery)) {
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+        }
+    }
 
 }
