@@ -84,11 +84,14 @@ public class ReplyThreadCard extends Card {
         } else {
             String currentUser = StartCSE360.loggedInUser.getUserName();
             
+            // Check if the current user is the author of the question
             boolean isAuthor = currentUser.equals(question.getAuthor());
+            // Check if the current user has permission to mark a solution (admin, reviewer, instructor, or staff)
             boolean hasPermission = StartCSE360.loggedInUser.getRole().stream().anyMatch(role ->
                 role == UserRole.ADMIN || role == UserRole.REVIEWER || role == UserRole.INSTRUCTOR || role == UserRole.STAFF
             );
 
+            // If the user is either the author or has a privileged role, show the "Mark as Solution" button
             if (isAuthor || hasPermission) {
                 CustomButton markAsSolution = new CustomButton("Mark as Solution", CustomButton.ColorPreset.BLUE, e -> {
                     question.resolveQuestion(answer.getUUID());
@@ -104,8 +107,9 @@ public class ReplyThreadCard extends Card {
         			// If the reply begins with "Reviewer Solution" The delete button says "Delete Solution", else "Delete Reply"
         		    answer.getBodyText().startsWith("Reviewer Solution:") ? "Delete Solution" : "Delete Reply", 
         		    CustomButton.ColorPreset.GREY, e -> {
-        		        // Remove the answer from the list
+        		        // Remove the answer from the list if the answer is not null
         		    	if (answer != null) {
+        		    		// Delete the answer from the database
         		    		StartCSE360.answers.safeDeleteAnswer(answer.getUUID());
 
         		            // Make sure the question no longer references the deleted review
